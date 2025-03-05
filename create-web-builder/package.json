@@ -1,0 +1,30 @@
+{
+    "name": "@cloudplex/create-cortex-app",
+    "version": "5.2.0",
+    "description": "云极科技前端创建应用使用的脚手架工具。",
+    "author": {
+      "name": "云极科技",
+      "email": "cloudplex@163.com",
+      "url": "https://www.cloudplex.cn"
+    },
+    "homepage": "https://gitee.com/cloudplex/cortex-app/tree/master/packages/create-cortex-app",
+    "bin": {
+      "create-cortex-app": "bin/create-cortex-app"
+    },
+    "files": [
+      "bin",
+      "lib"
+    ],
+    "devDependencies": {
+      "@types/inquirer": "^8.2.1",
+      "@types/node": "^16.x",
+      "@types/signale": "^1.4.4",
+      "typescript": "^4.9.4"
+    },
+    "dependencies": {
+      "ansi-colors": "^4.1.3",
+      "fast-glob": "^3.2.12",
+      "inquirer": "8.2.4",
+      "signale": "^1.4.0"
+    }
+  }
