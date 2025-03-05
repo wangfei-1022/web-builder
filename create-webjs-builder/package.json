@@ -1,0 +1,30 @@
+{
+    "name": "@webjs/create-webjs-builder",
+    "version": "1.0.0",
+    "description": "@webjs前端创建应用使用的脚手架工具",
+    "author": {
+      "name": "废废",
+      "email": "927230462@qq.com",
+      "url": "http://www.wf-ljq.shop"
+    },
+    "homepage": "https://github.com/wangfei-1022/webjs/tree/main/create-webjs-builder",
+    "bin": {
+      "create-webjs-builder": "bin/create-webjs-builder"
+    },
+    "files": [
+      "bin",
+      "lib"
+    ],
+    "devDependencies": {
+      "@types/inquirer": "^8.2.1",
+      "@types/node": "^16.x",
+      "@types/signale": "^1.4.4",
+      "typescript": "^4.9.4"
+    },
+    "dependencies": {
+      "ansi-colors": "^4.1.3",
+      "fast-glob": "^3.2.12",
+      "inquirer": "8.2.4",
+      "signale": "^1.4.0"
+    }
+  }
