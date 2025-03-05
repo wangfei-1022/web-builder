@@ -1,6 +1,7 @@
 {
     "name": "@webjs/create-webjs-builder",
     "version": "1.0.0",
+    "private": false,
     "description": "@webjs前端创建应用使用的脚手架工具",
     "author": {
       "name": "废废",
