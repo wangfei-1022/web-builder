@@ -1,0 +1,59 @@
+{
+  "name": "@cloudplex/cortex",
+  "version": "5.2.5",
+  "description": "云极科技前端应用核心。",
+  "author": {
+    "name": "云极科技",
+    "email": "cloudplex@163.com",
+    "url": "https://www.cloudplex.cn"
+  },
+  "homepage": "https://gitee.com/cloudplex/cortex-app/tree/master/packages/cortex",
+  "bin": {
+    "cortex": "bin/cortex"
+  },
+  "main": "lib/index.js",
+  "typings": "lib/index.d.ts",
+  "files": [
+    "bin",
+    "lib",
+    "types"
+  ],
+  "devDependencies": {
+    "@types/ejs": "^3.1.1",
+    "@types/micromatch": "^4.0.2",
+    "@types/node": "^16.x",
+    "@types/ssh2-sftp-client": "^9.0.0",
+    "typescript": "^4.9.4",
+    "vite": "^4.0.4"
+  },
+  "dependencies": {
+    "@babel/generator": "^7.20.14",
+    "@babel/helper-module-imports": "^7.18.6",
+    "@babel/parser": "^7.20.13",
+    "@babel/template": "^7.20.7",
+    "@babel/traverse": "^7.20.13",
+    "@babel/types": "^7.20.7",
+    "@types/babel__generator": "^7.6.4",
+    "@types/babel__template": "^7.4.1",
+    "@types/babel__traverse": "^7.18.3",
+    "@types/inquirer": "^8.2.1",
+    "@types/inquirer-autocomplete-prompt": "^1.3.4",
+    "@types/pluralize": "^0.0.29",
+    "@types/signale": "^1.4.4",
+    "ansi-colors": "^4.1.3",
+    "axios": "^1.2.6",
+    "deepmerge": "^4.3.0",
+    "dotenv": "^16.0.3",
+    "ejs": "^3.1.8",
+    "esbuild": "^0.17.5",
+    "fast-glob": "^3.2.12",
+    "inquirer": "8.2.4",
+    "inquirer-autocomplete-prompt": "^2.0.0",
+    "micromatch": "^4.0.5",
+    "openapi-types": "^12.1.0",
+    "path-to-regexp": "^6.2.1",
+    "pluralize": "^8.0.0",
+    "signale": "^1.4.0",
+    "ssh2-sftp-client": "^9.0.4"
+  }
+}
