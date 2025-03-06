@@ -1,0 +1,400 @@
+/** 箱型 */
+entity OmcContainerType {
+
+    /** 箱长 */
+    // visible: true
+    // width: 160
+    length String required maxlength(4),
+
+    /** 分组代码 */
+    // visible: true
+    // width: 160
+    // options: 20GP、40GP、40HC、45HC
+    // inputRender: select
+    groupCode String required maxlength(2),
+
+    /** 通用代码 */
+    // visible: true
+    // width: 160
+    // 新增表单：不可见，根据尺寸+分组代码生成
+    // 编辑表单：不可见
+    generalCode String required maxlength(4),
+
+    /** ISO代码 */
+    // visible: true
+    // width: 160
+    isoCode String required maxlength(4),
+
+    /** 描述 */
+    // visible: true
+    // width: 160
+    description String required maxlength(20),
+
+    /** TEU */
+    // visible: true
+    // width: 160
+    teu BigDecimal required,
+
+    /** 备注 */
+    // visible: true
+    // width: 160
+    remark String maxlength(200),
+
+    /** 启用状态 */
+    // visible: true
+    // width: 160
+    enabled Boolean required,
+
+    // 继承基础属性 ----------
+
+    /** 租户ID */
+    tenantId Long required,
+
+    /** 创建人ID */
+    createBy Long required,
+
+    /** 创建人名称 */
+    createByName String required maxlength(64),
+
+    /** 创建时间 */
+    createTime Long required,
+
+    /** 更新人ID */
+    updateBy Long required,
+
+    /** 更新人名称 */
+    updateByName String required maxlength(64),
+
+    /** 更新时间 */
+    updateTime Long required,
+
+    /** 操作URL */
+    optUrl String maxlength(512)
+}
+
+/** 堆场 */
+entity OmcTerminal {
+
+    /** 堆场类型 */
+    // visible: true
+    // width: 160
+    // options: 堆场、码头、CFS
+    type String required maxlength(10),
+
+    /** 堆场代码 */
+    // visible: true
+    // width: 160
+    // 编辑表单：锁定
+    code String required maxlength(10),
+
+    /** 堆场名称 */
+    // visible: true
+    // width: 160
+    name String required maxlength(30),
+
+    /** 关联港口代码 */
+    // visible: true
+    // width: 160
+    // 新增表单：从“海港”实体选择“代码 | 名称”
+    portCode String required maxlength(10),
+
+    /** 关联港口名称 */
+    // visible: true
+    // width: 160
+    // 新增表单：从“海港”实体选择“代码 | 名称”
+    portName String required maxlength(30),
+
+    /** 国家 */
+    // visible: true
+    // width: 160
+    country String required maxlength(30),
+
+    /** 州/省/区 */
+    // visible: true
+    // width: 160
+    province String required maxlength(30),
+
+    /** 城市 */
+    // visible: true
+    // width: 160
+    city String required maxlength(30),
+
+    /** 地址 */
+    // visible: true
+    // width: 160
+    address String required maxlength(200),
+
+    /** 联系人 */
+    // visible: true
+    // width: 160
+    contact String maxlength(30),
+
+    /** 联系电话 */
+    // visible: true
+    // width: 160
+    contactNumber String maxlength(30),
+
+    /** 邮箱 */
+    // visible: true
+    // width: 160
+    email String maxlength(100),
+
+    // 继承基础属性 ----------
+
+    /** 租户ID */
+    tenantId Long required,
+
+    /** 创建人ID */
+    createBy Long required,
+
+    /** 创建人名称 */
+    createByName String required maxlength(64),
+
+    /** 创建时间 */
+    createTime Long required,
+
+    /** 更新人ID */
+    updateBy Long required,
+
+    /** 更新人名称 */
+    updateByName String required maxlength(64),
+
+    /** 更新时间 */
+    updateTime Long required,
+
+    /** 操作URL */
+    optUrl String maxlength(512)
+}
+
+/** 集装箱 */
+entity OmcContainer {
+
+    // 基本属性 ----------
+
+    /** 合同号 */
+    // visible: true
+    // width: 160
+    // inputRender: select
+    // filter: true
+    // filterRender: input
+    // 新增表单：从“租购订单”实体选择“合同号”
+    // 编辑表单：锁定
+    contractNumber String required maxlength(10),
+
+    /** 订单号 */
+    // visible: true
+    // width: 160
+    // inputRender: select
+    // filter: true
+    // filterRender: input
+    // 新增表单：根据“合同号”，从“租购订单”实体选择“订单号”
+    // 编辑表单：锁定
+    orderNumber String required maxlength(10),
+
+    /** 批次号 */
+    // visible: true
+    // width: 160
+    // filter: true
+    // filterRender: input
+    // disabled: true
+    // 新增表单：根据“订单号”，获取“租购订单”实体的“批次号”填入，锁定
+    // 编辑表单：锁定
+    batchNumber String required maxlength(10),
+
+    /** 类别 */
+    // visible: true
+    // width: 160
+    // options: 新购、租入
+    // inputRender: select
+    // filter: true
+    // filterRender: select
+    // 新增表单：根据“订单号”，获取“租购订单”实体的“订单类型”填入，锁定
+    // 编辑表单：锁定
+    category String required maxlength(10),
+
+    /** 集装箱号 */
+    // visible: true
+    // width: 160
+    // filter: true
+    // filterRender: inputTag
+    // 新增表单：校验唯一性、ISO箱号规则
+    // 编辑表单：锁定
+    containerNumber String required maxlength(11),
+
+    /** 箱东 */
+    // visible: true
+    // width: 160
+    // filter: true
+    // filterRender: select
+    // 新增表单：根据“订单号”，获取“租购订单”实体的“箱东”填入，锁定
+    // 编辑表单：锁定
+    owner String required maxlength(10),
+
+    /** ISO代码 */
+    // visible: true
+    // width: 160
+    // inputRender: select
+    // 新增表单：从“箱型”实体选择“ISO代码 | 箱型代码”，箱型只加载启用的箱型数据
+    // 编辑表单：锁定
+    isoCode String required maxlength(4),
+
+    /** 箱型代码 */
+    // visible: true
+    // width: 160
+    // inputRender: select
+    // filter: true
+    // filterRender: select
+    // 新增表单：从“箱型”实体选择“ISO代码 | 箱型代码”，箱型只加载启用的箱型数据
+    // 编辑表单：锁定
+    generalCode String required maxlength(4),
+
+    /** 当前箱况 */
+    // visible: false
+    // width: 160
+    // options: AV | 好箱、DM | 坏箱
+    // inputRender: select
+    // filter: true
+    // filterRender: select
+    // 新增表单：不可见，默认值“AV”
+    // 编辑表单：不可见
+    currentState String required maxlength(10),
+
+    /** 箱状态 */
+    // visible: true
+    // width: 160
+    // options: 在用、全损、已退出、修洗中
+    // inputRender: select
+    // filter: true
+    // filterRender: select
+    // 新增表单：不可见，默认值“在用”
+    // 编辑表单：不可见
+    status String required maxlength(10),
+
+    /** 起租日期 */
+    // visible: true
+    // width: 160
+    // 新增表单：若“租购订单”的“订单类型 = 租入”，获取“起租日期”填入，锁定
+    // 编辑表单：锁定
+    rentalStartDate LocalDate,
+
+    /** 租期(天) */
+    // visible: true
+    // width: 160
+    // 新增表单：若“租购订单”的“订单类型 = 租入”，获取“租期(天)”填入，锁定
+    // 编辑表单：锁定
+    rentalPeriod Integer,
+
+    /** 租入天数 */
+    // visible: true
+    // width: 160
+    // 根据“起租日期”，自动计算“租入天数”
+    // rentalDays Integer,
+
+    /** 退租日期 */
+    // visible: true
+    // width: 160
+    // 新增表单：不可见
+    // 编辑表单：不可见
+    // 新增退组订单后，自动更新值
+    rentalEndDate LocalDate,
+
+    /** 交箱堆场代码 */
+    // visible: true
+    // width: 160
+    // 从“堆场”实体选择堆场，带出“堆场代码”
+    deliveryTerminalCode String required maxlength(10),
+
+    /** 交箱堆场名称 */
+    // visible: true
+    // width: 160
+    // 从“堆场”实体选择堆场，带出“堆场名称”
+    deliveryTerminalName String required maxlength(30),
+
+    // /** 交箱情况 */
+    // visible: true
+    // width: 160
+    // TODO: To be discussed, 待定
+    // delivered Boolean,
+
+    /** 生产日期 */
+    // visible: true
+    // width: 160
+    productionDate LocalDate,
+
+    /** 最大载重(KG) */
+    // visible: true
+    // width: 160
+    // 校验大于0
+    maxPayload BigDecimal required,
+
+    /** 有效负载(KG) */
+    // visible: true
+    // width: 160
+    // 校验大于0
+    effectiveLoad BigDecimal,
+
+    /** 容量(CBM) */
+    // visible: true
+    // width: 160
+    // 校验大于0
+    capacity BigDecimal,
+
+    /** 皮重 */
+    // visible: true
+    // width: 160
+    // 校验大于0
+    tareWeight BigDecimal,
+
+    /** 备注 */
+    // visible: true
+    // width: 160
+    remark String maxlength(200),
+
+    // 图片文件 ----------
+
+    /** 箱证文件 */
+    // visible: true
+    // width: 160
+    // 展示文件名链接
+    certificationFile String maxlength(200),
+
+    /** 箱况图片 */
+    // visible: true
+    // width: 160
+    // 展示缩略图
+    stateImage String maxlength(200),
+
+    /** 铭牌图片 */
+    // visible: true
+    // width: 160
+    // 展示缩略图
+    brandImage String maxlength(200),
+
+    // 继承基础属性 ----------
+
+    /** 租户ID */
+    tenantId Long required,
+
+    /** 创建人ID */
+    createBy Long required,
+
+    /** 创建人名称 */
+    createByName String required maxlength(64),
+
+    /** 创建时间 */
+    // visible: true
+    // width: 160
+    createTime Long required,
+
+    /** 更新人ID */
+    updateBy Long required,
+
+    /** 更新人名称 */
+    updateByName String required maxlength(64),
+
+    /** 更新时间 */
+    updateTime Long required,
+
+    /** 操作URL */
+    optUrl String maxlength(512)
+}

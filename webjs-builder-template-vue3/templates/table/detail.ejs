@@ -1,0 +1,263 @@
+<template>
+  <ASpace direction="vertical" size="medium" fill>
+    <ACard :bordered="false">
+<%_ if (type === 'page') { _%>
+      <Descriptions :title="<%- schema.extra.name %>Request.data?.<%- entity.titleField %> ?? '<%- schema.description %>明细'"
+                    :columns="<%- schema.extra.name %>Columns"
+                    :loading="<%- schema.extra.name %>Request.loading"
+                    :data="<%- schema.extra.name %>Request.data">
+<%_ } else { _%>
+      <Descriptions :cols="1" :columns="<%- schema.extra.name %>Columns" :data="<%- schema.extra.name %>">
+<%_ } _%>
+<%_ if (type === 'page') { _%>
+        <!-- 描述操作区模板 -->
+        <template #extra>
+          <ASpace>
+            <AButton @click="<%- schema.extra.name %>Request.load">刷新</AButton>
+  <%_ if (functions.update && functions.delete) { _%>
+            <AButtonGroup>
+              <AButton :title="update<%- schema.extra.Name %>Hint"
+                        :disabled="update<%- schema.extra.Name %>Disabled"
+                        @click="showUpdate<%- schema.extra.Name %>Handle">
+                编辑
+              </AButton>
+              <AButton type="secondary"
+                        status="danger"
+                        :title="delete<%- schema.extra.Name %>Hint"
+                        :disabled="delete<%- schema.extra.Name %>Disabled"
+                        @click="showDelete<%- schema.extra.Name %>Handle">
+                删除
+              </AButton>
+            </AButtonGroup>
+  <%_ } else if (functions.update) { _%>
+            <AButton :title="update<%- schema.extra.Name %>Hint"
+                      :disabled="update<%- schema.extra.Name %>Disabled"
+                      @click="showUpdate<%- schema.extra.Name %>Handle">
+              编辑
+            </AButton>
+  <%_ } else if (functions.delete) { _%>
+            <AButton type="secondary"
+                      status="danger"
+                      :title="delete<%- schema.extra.Name %>Hint"
+                      :disabled="delete<%- schema.extra.Name %>Disabled"
+                      @click="showDelete<%- schema.extra.Name %>Handle">
+              删除
+            </AButton>
+  <%_ } _%>
+          </ASpace>
+        </template>
+<%_ } _%>
+<%_
+  if (
+    schema.properties
+      .filter(({ name }) => !/^(id|entityUuid|.+Id)$/.test(name))
+      .some(({ type, format }) => type === 'number' && format !== 'bigdecimal')
+  ) {
+_%>
+        <!-- 数值模板 -->
+        <template #number="{ value }">
+          <NumberView :value="value" />
+        </template>
+<%_ } _%>
+<%_
+  if (
+    schema.properties
+      .filter(({ name }) => !/^(id|entityUuid|.+Id)$/.test(name))
+      .some(({ type, format }) => type === 'number' && format === 'bigdecimal')
+  ) {
+_%>
+        <!-- 数值模板（2位小数） -->
+        <template #decimal2="{ value }">
+          <NumberView :value="value" format="1.2" />
+        </template>
+<%_ } _%>
+<%_
+  if (
+    schema.properties
+      .filter(({ name }) => !/^(id|entityUuid|.+Id)$/.test(name))
+      .some(({ type }) => type === 'boolean')
+  ) {
+_%>
+        <!-- 布尔值模板 -->
+        <template #boolean="{ value }">
+          <BooleanView :value="value" />
+        </template>
+<%_ } _%>
+      </Descriptions>
+    </ACard>
+  </ASpace>
+</template>
+
+<script lang="tsx" setup>
+<%_ Object.entries(imports).forEach(([name, { default: _default, values, types }]) => { _%>
+  <%_ if (_default || values.size) { _%>
+import <% if (_default) { %><%- _default %><% } %><% if (_default && (values.size || types.size)) { %>, <% } %><% if (values.size || types.size) { %>{ <% } %><%- Array.from(values).concat(Array.from(types).map(type => `type ${type}`)).join(', ') %><% if (values.size || types.size) { %> }<% } %> from '<%- name %>';
+  <%_ } else if (types.size) { _%>
+import type { <%- Array.from(types).join(', ') %> } from '<%- name %>';
+  <%_ } _%>
+<%_ }) _%>
+<%_ if (type === 'page') { _%>
+
+const route = useRoute();
+const system = useSystem();
+
+// 获取<%- schema.description %>
+const <%- schema.extra.name %>Request = useRequest(
+  async () => {
+    const { data } = await get<%- schema.extra.Name %>(Number(route.params.id));
+    return {
+      $raw: data,
+      ...cloneDeep(data),
+    };
+  },
+  {
+    onError: error => Message.error(getErrorMessage(error)),
+  },
+);
+
+// 更新当前标题
+watchEffect(() => {
+  const title = <%- schema.extra.name %>Request.data
+    ? `<%- schema.description %>：${<%- schema.extra.name %>Request.data.<%- entity.titleField %>}`
+    : '<%- schema.description %>明细';
+  system.setTitle(title);
+});
+<%_ } else { _%>
+
+// 定义属性
+const props = defineProps({
+  /** 源数据 */
+  raw: Object as PropType<OptimizeModel<<%- schema.name %>>>,
+});
+
+// <%- schema.description %>
+const <%- schema.extra.name %> = computed(() => {
+  return props.raw && {
+    ...cloneDeep(props.raw),
+  };
+});
+<%_ } _%>
+
+// <%- schema.description %>列
+const <%- schema.extra.name %>Columns: DescriptionsColumnData[] = [
+<%_
+  schema.properties
+    .filter(({ name }) => !/^(id|entityUuid|.+Id)$/.test(name))
+    .forEach(({ name, description, type, format, extra }) => {
+_%>
+  { title: '<%- description %>', dataIndex: '<%- name %>'<% if (type === 'number') { %>, slotName: '<%- format === 'bigdecimal' ? 'decimal2' : 'number' %>'<% } else if (type === 'boolean') { %>, slotName: 'boolean'<% } %> },
+<%_ }) _%>
+];
+<%_ if (type === 'page') { _%>
+  <%_ if (functions.update) { _%>
+
+// 编辑<%- schema.description %>
+const update<%- schema.extra.Name %>Hint = computed(() => {
+  return !<%- schema.extra.name %>Request.data
+    ? '<%- schema.description %>不存在'
+    : '';
+});
+const update<%- schema.extra.Name %>Disabled = computed(() => !!update<%- schema.extra.Name %>Hint.value);
+const showUpdate<%- schema.extra.Name %>Handle = () => {
+  const <%- schema.extra.name %> = <%- schema.extra.name %>Request.data!;
+  const formRef = ref<InstanceType<typeof <%- functions.update.component %>>>();
+  Modal.open({
+    title: `编辑<%- schema.description %>：${<%- schema.extra.name %>.<%- entity.titleField %>}`,
+    content: () => (
+      <<%- functions.update.component %> ref={formRef} patch={<%- schema.extra.name %>} />
+    ),
+    width: <%-
+      Math.min(
+        4,
+        Math.ceil(
+          schema.properties
+            .filter(({ name }) => !/^(id|entityUuid|.+Id|createdBy|createdTime|lastModifiedBy|lastModifiedTime)$/.test(name))
+            .length / 5
+        )
+      ) * (278 + 16) - 16 + 20 * 2
+    %>,
+    maskClosable: false,
+    onBeforeOk: async () => {
+      try {
+        const modelPatch = await formRef.value!.validate();
+        try {
+          const modelValue = {
+            ...modelPatch,
+          };
+          const modelUpdate = getEntityUpdate(modelValue, <%- schema.extra.name %>);
+          if (modelUpdate) {
+    <%_
+      if (
+        schema.properties
+          .filter(({ name }) => !/^(id|entityUuid|.+Id|createdBy|createdTime|lastModifiedBy|lastModifiedTime)$/.test(name))
+          .some(({ extra }) => /^(file|image)$/.test(extra.inputRender))
+      ) {
+    _%>
+            const params = getModelFilesUpdate({
+              modelPatch,
+              modelValue: <%- schema.extra.name %>,
+              fields: [
+      <%_
+        schema.properties
+          .filter(({ name }) => !/^(id|entityUuid|.+Id|createdBy|createdTime|lastModifiedBy|lastModifiedTime)$/.test(name))
+          .filter(({ extra }) => /^(file|image)$/.test(extra.inputRender))
+          .forEach(({ name }) => {
+      _%>
+                '<%- name %>',
+      <%_ }) _%>
+              ],
+            });
+            await partialUpdate<%- schema.extra.Name %>(modelUpdate, params as any);
+    <%_ } else { _%>
+            await partialUpdate<%- schema.extra.Name %>(modelUpdate);
+    <%_ } _%>
+            Message.success('更新<%- schema.description %>成功');
+            <%- schema.extra.name %>Request.load();
+          }
+          return true;
+        } catch (error) {
+          Message.error(getErrorMessage(error));
+          return false;
+        }
+      } catch (error) {
+        return false;
+      }
+    },
+  });
+}
+  <%_ } _%>
+  <%_ if (functions.delete) { _%>
+
+// 删除<%- schema.description %>
+const delete<%- schema.extra.Name %>Hint = computed(() => {
+  return !<%- schema.extra.name %>Request.data
+    ? '<%- schema.description %>不存在'
+    : '';
+});
+const delete<%- schema.extra.Name %>Disabled = computed(() => !!delete<%- schema.extra.Name %>Hint.value);
+const showDelete<%- schema.extra.Name %>Handle = () => {
+  const <%- schema.extra.name %> = <%- schema.extra.name %>Request.data!;
+  Modal.confirm({
+    title: '操作确认',
+    content: `是否确定删除<%- schema.description %> “${<%- schema.extra.name %>.<%- entity.titleField %>}”？`,
+    okButtonProps: {
+      type: 'secondary',
+      status: 'danger',
+    },
+    maskClosable: false,
+    onBeforeOk: async () => {
+      try {
+        await delete<%- schema.extra.Name %>(<%- schema.extra.name %>.id);
+        Message.success('删除<%- schema.description %>成功');
+        system.closeCurrentPage();
+        return true;
+      } catch (error) {
+        Message.error(getErrorMessage(error));
+        return false;
+      }
+    },
+  });
+}
+  <%_ } _%>
+<%_ } _%>
+</script>

@@ -1,0 +1,56 @@
+import { request } from '@/utils';
+<%_ if (requireContent) { _%>
+<%- requireContent %>
+<%_ } _%>
+<% requests.forEach(request => { %>
+/**
+ * <%- request.description %>
+  <%_ if (request.params) { _%>
+    <%_ request.params.forEach(param => { _%>
+ * @param <%- param.name %> <%- param.description %>
+    <%_ }); _%>
+  <%_ } _%>
+  <%_ if (request.body) { _%>
+ * @param data 数据
+  <%_ } _%>
+  <%_ if (request.query) { _%>
+ * @param params 参数
+  <%_ } _%>
+ */
+export function <%- request.name %>(
+  <%_ if (request.params) { _%>
+    <%_ request.params.forEach(param => { _%>
+  <%- param.name %>: <%- param.type %>,
+    <%_ }); _%>
+  <%_ } _%>
+  <%_ if (request.body) { _%>
+  data: <%- request.body %>,
+  <%_ } _%>
+  <%_ if (request.query) { _%>
+  params<%- request.queryRequired ? '' : '?' %>: {
+    <%_ request.query.forEach(param => { _%>
+    /** <%- param.description %> */
+    <%- param.name %><%- param.required ? '' : '?' %>: <%- param.type %>;
+    <%_ }); _%>
+  },
+  <%_ } _%>
+) {
+  return request<<%- request.return %>>({
+    url: <%- request.url %>,
+  <%_ if (request.method) { _%>
+    method: '<%- request.method %>',
+  <%_ } _%>
+    headers: {
+  <%_ request.headers.forEach(prop => { _%>
+      <%- prop.key %>: <%- prop.value %>,
+  <%_ }); _%>
+    },
+  <%_ if (request.body) { _%>
+    data,
+  <%_ } _%>
+  <%_ if (request.query) { _%>
+    params,
+  <%_ } _%>
+  });
+}
+<% }); %>

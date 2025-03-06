@@ -1,0 +1,846 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/user/create": {
+      "post": {
+        "operationId": "createUserList",
+        "summary": "新增用户表",
+        "description": "新增用户表",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Custom token",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserCreateDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "RDtoOfUserEntity",
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/RDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "$ref": "#/components/schemas/UserEntity"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "user"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/user/list": {
+      "post": {
+        "operationId": "UserController_queryList",
+        "summary": "用户表列表（query）",
+        "description": "用户表列表（query）",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Custom token",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserListDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "RListDtoOfUserEntity",
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/RListDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/UserEntity"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "user"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "get": {
+        "operationId": "UserController_list",
+        "summary": "用户表列表",
+        "description": "用户表列表",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Custom token",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": true,
+            "in": "query",
+            "description": "页码",
+            "schema": {
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "psize",
+            "required": true,
+            "in": "query",
+            "description": "psize",
+            "schema": {
+              "default": 20,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "RListDtoOfUserEntity",
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/RListDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/UserEntity"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "user"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/user/all": {
+      "get": {
+        "operationId": "getAllUserLists",
+        "summary": "用户表列表-全部",
+        "description": "用户表列表-全部",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Custom token",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "required": false,
+            "description": "用户名",
+            "name": "username",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "required": false,
+            "description": "密码",
+            "name": "password",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "required": false,
+            "description": "性别",
+            "name": "gender",
+            "in": "query",
+            "schema": {
+              "enum": [
+                0,
+                1,
+                2
+              ],
+              "type": "number"
+            }
+          },
+          {
+            "required": false,
+            "description": "手机号",
+            "name": "phone",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "required": false,
+            "description": "头像",
+            "name": "avatar",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "required": false,
+            "description": "昵称",
+            "name": "nickname",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "required": false,
+            "description": "签名",
+            "name": "desc",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "RListDtoOfUserEntity",
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/RListDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/UserEntity"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "user"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/user/details/{id}": {
+      "get": {
+        "operationId": "UserController_details",
+        "summary": "某个用户表信息",
+        "description": "用户表详情",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Custom token",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "RDtoOfUserEntity",
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/RDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "$ref": "#/components/schemas/UserEntity"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "user"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/user/update/{id}": {
+      "patch": {
+        "operationId": "partialUpdateUserList",
+        "summary": "修改用户表信息",
+        "description": "修改用户表",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Custom token",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserUpdateDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "RDtoOfString",
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/RDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "user"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/user/remove/{id}": {
+      "delete": {
+        "operationId": "deleteUserList",
+        "summary": "删除用户表",
+        "description": "删除用户表",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Custom token",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "RDtoOfString",
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/RDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "user"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/user/removes": {
+      "post": {
+        "operationId": "UserController_removes",
+        "summary": "删除多个用户表",
+        "description": "删除多个用户表",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Custom token",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BodyIdsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "RDtoOfString",
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/RDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "user"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "Cats example",
+    "description": "<a href=\"/docs-json\">/docs-json</a>",
+    "version": "1.0",
+    "contact": {}
+  },
+  "tags": [
+    {
+      "name": "cats",
+      "description": ""
+    }
+  ],
+  "servers": [],
+  "components": {
+    "schemas": {
+      "UserEntity": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "id"
+          },
+          "username": {
+            "type": "string",
+            "description": "用户名"
+          },
+          "password": {
+            "type": "string",
+            "description": "密码"
+          },
+          "gender": {
+            "type": "number",
+            "description": "性别",
+            "enum": [
+              0,
+              1,
+              2
+            ]
+          },
+          "phone": {
+            "type": "string",
+            "description": "手机号"
+          },
+          "avatar": {
+            "type": "string",
+            "description": "头像"
+          },
+          "nickname": {
+            "type": "string",
+            "description": "昵称"
+          },
+          "desc": {
+            "type": "string",
+            "description": "签名"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "创建时间"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "修改时间"
+          }
+        },
+        "required": [
+          "id",
+          "username",
+          "password",
+          "gender",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "UserCreateDto": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "description": "用户名"
+          },
+          "password": {
+            "type": "string",
+            "description": "密码"
+          },
+          "gender": {
+            "type": "number",
+            "description": "性别",
+            "enum": [
+              0,
+              1,
+              2
+            ]
+          },
+          "phone": {
+            "type": "string",
+            "description": "手机号"
+          },
+          "avatar": {
+            "type": "string",
+            "description": "头像"
+          },
+          "nickname": {
+            "type": "string",
+            "description": "昵称"
+          },
+          "desc": {
+            "type": "string",
+            "description": "签名"
+          }
+        },
+        "required": [
+          "username",
+          "password",
+          "gender"
+        ]
+      },
+      "UserListWhereDto": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "description": "用户名"
+          },
+          "password": {
+            "type": "string",
+            "description": "密码"
+          },
+          "gender": {
+            "type": "number",
+            "description": "性别",
+            "enum": [
+              0,
+              1,
+              2
+            ]
+          },
+          "phone": {
+            "type": "string",
+            "description": "手机号"
+          },
+          "avatar": {
+            "type": "string",
+            "description": "头像"
+          },
+          "nickname": {
+            "type": "string",
+            "description": "昵称"
+          },
+          "desc": {
+            "type": "string",
+            "description": "签名"
+          }
+        }
+      },
+      "UserListDto": {
+        "type": "object",
+        "properties": {
+          "where": {
+            "$ref": "#/components/schemas/UserListWhereDto"
+          },
+          "limit": {
+            "$ref": "#/components/schemas/Limit"
+          }
+        }
+      },
+      "UserUpdateDto": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "description": "用户名"
+          },
+          "password": {
+            "type": "string",
+            "description": "密码"
+          },
+          "gender": {
+            "type": "number",
+            "description": "性别",
+            "enum": [
+              0,
+              1,
+              2
+            ]
+          },
+          "phone": {
+            "type": "string",
+            "description": "手机号"
+          },
+          "avatar": {
+            "type": "string",
+            "description": "头像"
+          },
+          "nickname": {
+            "type": "string",
+            "description": "昵称"
+          },
+          "desc": {
+            "type": "string",
+            "description": "签名"
+          }
+        }
+      },
+      "RListDto": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "number",
+            "description": "通用状态码[200:正常, 400: 客户端参数错误, 500: 服务器内部错误]"
+          },
+          "status": {
+            "type": "number",
+            "description": "业务状态码(0为标准状态,其它见方法提示)"
+          },
+          "msg": {
+            "type": "string",
+            "description": "业务详细信息(可为空)"
+          },
+          "data": {
+            "type": "object"
+          },
+          "total": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "code",
+          "status",
+          "msg",
+          "data",
+          "total"
+        ]
+      },
+      "OmcTerminalDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "number",
+            "description": "类型"
+          },
+          "code": {
+            "type": "number",
+            "description": "Code"
+          },
+          "name": {
+            "type": "number",
+            "description": "名称"
+          },
+          "portCode": {
+            "type": "number",
+            "description": "港口名称"
+          },
+          "portName": {
+            "type": "number",
+            "description": "港口名称"
+          },
+          "msg": {
+            "type": "string",
+            "description": "业务详细信息(可为空)"
+          },
+          "data": {
+            "type": "object"
+          },
+          "total": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "code",
+          "status",
+          "msg",
+          "data",
+          "total"
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,382 @@
+<template>
+  <ATabs v-model:activeKey="<%- schema.extra.name %>TabCurrent" lazyLoad>
+    <ATabPane key="query" title="查询结果">
+      <ARow :gutter="8">
+        <ACol flex="1">
+          <AInput v-if="!$slots.query"
+                  placeholder="输入任意查询条件"
+                  style="width: 280px;"
+                  v-model="<%- schema.extra.name %>Query.keywords"
+                  allowClear />
+          <slot v-else name="query"></slot>
+        </ACol>
+
+        <ACol flex="initial">
+          <ASpace wrap>
+            <AButton @click="<%- schema.extra.name %>Request.load">
+              <template #icon>
+                <IconRefresh />
+              </template>
+            </AButton>
+            <AButton @click="<%- schema.extra.name %>Columns.showSetting">
+              <template #icon>
+                <IconSettings />
+              </template>
+            </AButton>
+          </ASpace>
+        </ACol>
+      </ARow>
+
+      <ATable tableLayoutFixed
+              size="small"
+              :bordered="false"
+              :scroll="{ x: '100%', maxHeight: '500px' }"
+              :columns="<%- schema.extra.name %>Columns.value"
+              columnResizable
+              @columnResize="<%- schema.extra.name %>Columns.resize"
+              :loading="<%- schema.extra.name %>Request.loading"
+              :data="<%- schema.extra.name %>Request.data"
+              rowKey="id"
+              :pagination="{
+                total: <%- schema.extra.name %>Request.total,
+                showTotal: true,
+                current: <%- schema.extra.name %>Request.current,
+                pageSize: <%- schema.extra.name %>Request.pageSize,
+                showPageSize: true,
+                pageSizeOptions: [20, 50, 100, 200],
+              }"
+              @pageChange="<%- schema.extra.name %>Request.setCurrent"
+              @pageSizeChange="<%- schema.extra.name %>Request.setPageSize"
+              :rowSelection="{
+                type: multiple ? 'checkbox' : 'radio',
+                showCheckedAll: multiple,
+                width: 40,
+                fixed: true,
+              }"
+<%_ if (functions.sort) { _%>
+              v-model:selectedKeys="<%- schema.extra.name %>SelectedKeys"
+              @sorterChange="sort<%- schema.extra.Name %>Handle">
+<%_ } else { _%>
+              v-model:selectedKeys="<%- schema.extra.name %>SelectedKeys">
+<%_ } _%>
+<%_
+  if (
+    schema.properties
+      .filter(({ name }) => !/^(id|entityUuid|.+Id)$/.test(name))
+      .some(({ type, format }) => type === 'number' && format !== 'bigdecimal')
+  ) {
+_%>
+        <!-- 数值模板 -->
+        <template #number="{ record, column }">
+          <NumberView :value="get(record, column.dataIndex)" />
+        </template>
+<%_ } _%>
+<%_
+  if (
+    schema.properties
+      .filter(({ name }) => !/^(id|entityUuid|.+Id)$/.test(name))
+      .some(({ type, format }) => type === 'number' && format === 'bigdecimal')
+  ) {
+_%>
+        <!-- 数值模板（2位小数） -->
+        <template #decimal2="{ record, column }">
+          <NumberView :value="get(record, column.dataIndex)" format="1.2" />
+        </template>
+<%_ } _%>
+<%_
+  if (
+    schema.properties
+      .filter(({ name }) => !/^(id|entityUuid|.+Id)$/.test(name))
+      .some(({ type }) => type === 'boolean')
+  ) {
+_%>
+        <!-- 布尔值模板 -->
+        <template #boolean="{ record, column }">
+          <BooleanView :value="get(record, column.dataIndex)" />
+        </template>
+<%_ } _%>
+      </ATable>
+    </ATabPane>
+
+    <ATabPane key="selected" :title="`选中结果（${selected<%- schema.extra.Name %>Map.size}）`">
+      <ASpace wrap>
+        <APopconfirm content="确定移除选中结果？"
+                     type="warning"
+                     position="tl"
+                     :okButtonProps="{
+                       type: 'secondary',
+                       status: 'danger',
+                     }"
+                     @ok="batchRemoveSelected<%- schema.extra.Name %>Handle">
+          <AButton type="secondary"
+                   status="danger"
+                   :title="batchRemoveSelected<%- schema.extra.Name %>Hint"
+                   :disabled="batchRemoveSelected<%- schema.extra.Name %>Disabled">
+            <template #icon>
+              <IconDelete />
+            </template>移除
+          </AButton>
+        </APopconfirm>
+      </ASpace>
+
+      <ATable tableLayoutFixed
+              size="small"
+              :bordered="false"
+              :scroll="{ x: '100%', maxHeight: '500px' }"
+              :columns="[
+                ...<%- schema.extra.name %>Columns.value.slice(0, -1),
+                { title: '操作', dataIndex: 'actions', slotName: 'actions', width: 72, fixed: 'right' },
+                ...<%- schema.extra.name %>Columns.value.slice(-1),
+              ]"
+              columnResizable
+              @columnResize="<%- schema.extra.name %>Columns.resize"
+              :data="Array.from(selected<%- schema.extra.Name %>Map.values())"
+              rowKey="id"
+              :pagination="{
+                showTotal: true,
+                pageSize: selected<%- schema.extra.Name %>Map.size,
+                pageItemStyle: { display: 'none' },
+                activePageItemStyle: { display: 'none' },
+              }"
+              :rowSelection="{
+                type: 'checkbox',
+                showCheckedAll: true,
+                width: 40,
+                fixed: true,
+              }"
+              v-model:selectedKeys="selected<%- schema.extra.Name %>SelectedKeys">
+<%_
+  if (
+    schema.properties
+      .filter(({ name }) => !/^(id|entityUuid|.+Id)$/.test(name))
+      .some(({ type, format }) => type === 'number' && format !== 'bigdecimal')
+  ) {
+_%>
+        <!-- 数值模板 -->
+        <template #number="{ record, column }">
+          <NumberView :value="get(record, column.dataIndex)" />
+        </template>
+<%_ } _%>
+<%_
+  if (
+    schema.properties
+      .filter(({ name }) => !/^(id|entityUuid|.+Id)$/.test(name))
+      .some(({ type, format }) => type === 'number' && format === 'bigdecimal')
+  ) {
+_%>
+        <!-- 数值模板（2位小数） -->
+        <template #decimal2="{ record, column }">
+          <NumberView :value="get(record, column.dataIndex)" format="1.2" />
+        </template>
+<%_ } _%>
+<%_
+  if (
+    schema.properties
+      .filter(({ name }) => !/^(id|entityUuid|.+Id)$/.test(name))
+      .some(({ type }) => type === 'boolean')
+  ) {
+_%>
+        <!-- 布尔值模板 -->
+        <template #boolean="{ record, column }">
+          <BooleanView :value="get(record, column.dataIndex)" />
+        </template>
+<%_ } _%>
+        <!-- 列操作区模板 -->
+        <template #actions="{ record }">
+          <APopconfirm content="确定删除该行数据？"
+                       type="warning"
+                       position="tr"
+                       :okButtonProps="{
+                         type: 'secondary',
+                         status: 'danger',
+                       }"
+                       @ok="removeSelected<%- schema.extra.Name %>Handle(record)">
+            <ALink status="danger">移除</ALink>
+          </APopconfirm>
+        </template>
+      </ATable>
+    </ATabPane>
+  </ATabs>
+</template>
+
+<script lang="ts" setup>
+<%_ Object.entries(imports).forEach(([name, { default: _default, values, types }]) => { _%>
+  <%_ if (_default || values.size) { _%>
+import <% if (_default) { %><%- _default %><% } %><% if (_default && (values.size || types.size)) { %>, <% } %><% if (values.size || types.size) { %>{ <% } %><%- Array.from(values).concat(Array.from(types).map(type => `type ${type}`)).join(', ') %><% if (values.size || types.size) { %> }<% } %> from '<%- name %>';
+  <%_ } else if (types.size) { _%>
+import type { <%- Array.from(types).join(', ') %> } from '<%- name %>';
+  <%_ } _%>
+<%_ }) _%>
+
+// 定义属性
+const props = defineProps({
+  /** 查询参数 */
+  query: Object as PropType<Omit<NonNullable<Parameters<typeof getAll<%- schema.extra.Names %>>[0]>, 'page' | 'size' | 'sort'>>,
+  /** 开启多选模式 */
+  multiple: Boolean,
+  /** 获取新数据时保留选中数据 */
+  reserveOnFetch: Boolean,
+  /** 列持久化 key */
+  columnsPersistenceKey: String,
+  /** 模型值 */
+  modelValue: Array as PropType<<%- schema.name %>[]>,
+});
+
+// 定义事件
+const emit = defineEmits<{
+  (event: 'update:modelValue', modelValue: <%- schema.name %>[]): void;
+}>();
+
+// <%- schema.description %>查询参数
+const <%- schema.extra.name %>Query = reactive({
+  keywords: undefined as string | undefined,
+<%_ if (functions.sort) { _%>
+  sort: ['id,desc'],
+<%_ } _%>
+});
+
+// 获取<%- schema.description %>
+const <%- schema.extra.name %>Request = useRequestPagination(
+  async ({ current, pageSize }) => {
+    const query = {
+      ...<%- schema.extra.name %>Query,
+      ...props.query,
+      page: current - 1,
+      size: pageSize,
+<%_ if (!functions.sort) { _%>
+      sort: 'id,desc',
+<%_ } _%>
+    };
+    const { headers, data } = await getAll<%- schema.extra.Names %>(query);
+    return {
+      data: data.map(item => {
+        return {
+          $raw: item,
+          ...cloneDeep(item),
+        };
+      }),
+      total: Number(headers.xTotalCount),
+    };
+  },
+  {
+    onError: error => Message.error(getErrorMessage(error)),
+  },
+);
+watch(
+  [
+    () => ({ ...<%- schema.extra.name %>Query }),
+    () => ({ ...props.query }),
+  ],
+  debounce(<%- schema.extra.name %>Request.load, 500),
+);
+
+// <%- schema.description %>列
+const <%- schema.extra.name %>Columns = useTableColumns({
+  persistenceKey: props.columnsPersistenceKey ?? '<%- schema.extra.Name %>Select',
+  initialValue: [
+<%_
+  schema.properties
+    .filter(({ name }) => !/^(id|entityUuid|.+Id)$/.test(name))
+    .forEach(({ name, description, type, format, extra }) => {
+_%>
+    { title: '<%- description %>', dataIndex: '<%- name %>'<% if (type === 'number') { %>, slotName: <%- format === 'bigdecimal' ? `'decimal2'` : `'number'` %><% } else if (type === 'boolean') { %>, slotName: 'boolean'<% } %><% if (typeof extra.visible === 'boolean') { %>, visible: <%- extra.visible %><% } %><% if (extra.visible === 'always') { %>, visible: 'always'<% } %>, width: <%- typeof extra.width === 'number' ? extra.width : format === 'date-time' ? 180 : 200 %><% if (type === 'number') { %>, align: 'right'<% } %>, ellipsis: true, tooltip: true<% if (extra.sortable === true) { %>, sortable: { sortDirections: ['ascend', 'descend'], sorter: true }<% } %> },
+<%_ }); _%>
+  ],
+});
+
+// <%- schema.description %>标签样式
+const <%- schema.extra.name %>TabStyle = computed(() => {
+  const tabVisible = props.multiple && props.reserveOnFetch;
+  return {
+    navDisplay: tabVisible ? 'flex' : 'none',
+    contentPaddingTop: tabVisible ? '16px' : '8px',
+  };
+});
+
+// <%- schema.description %>标签
+const <%- schema.extra.name %>TabCurrent = ref('query');
+watch(
+  () => props.multiple,
+  () => {
+    <%- schema.extra.name %>TabCurrent.value = 'query';
+  },
+);
+<%_ if (functions.sort) { _%>
+
+// 排序<%- schema.description %>
+const sort<%- schema.extra.Name %>Handle = (dataIndex: string, direction: string) => {
+  <%- schema.extra.name %>Query.sort = direction
+    ? [`${dataIndex},${direction.slice(0, -3)}`].concat(<%- schema.extra.name %>Query.sort.slice(-1))
+    : <%- schema.extra.name %>Query.sort.slice(-1);
+}
+<%_ } _%>
+
+// 选择<%- schema.description %>
+const <%- schema.extra.name %>SelectedKeys = ref<number[]>([]);
+watch(
+  () => <%- schema.extra.name %>Request.data,
+  () => {
+    if (props.multiple && props.reserveOnFetch) {
+      <%- schema.extra.name %>SelectedKeys.value = <%- schema.extra.name %>Request.data
+        ?.filter(({ id }) => selected<%- schema.extra.Name %>Map.has(id))
+        .map(({ id }) => id) ?? [];
+    } else {
+      <%- schema.extra.name %>SelectedKeys.value = [];
+      selected<%- schema.extra.Name %>Map.clear();
+    }
+  },
+);
+const selected<%- schema.extra.Name %>Map = reactive(new Map<number, OptimizeModel<<%- schema.name %>>>());
+watch(
+  <%- schema.extra.name %>SelectedKeys,
+  () => {
+    <%- schema.extra.name %>Request.data
+      ?.forEach(<%- schema.extra.name %> => {
+        if (<%- schema.extra.name %>SelectedKeys.value.includes(<%- schema.extra.name %>.id)) {
+          selected<%- schema.extra.Name %>Map.set(<%- schema.extra.name %>.id, <%- schema.extra.name %>);
+        } else {
+          selected<%- schema.extra.Name %>Map.delete(<%- schema.extra.name %>.id);
+        }
+      });
+    selected<%- schema.extra.Name %>SelectedKeys.value = [];
+    emit('update:modelValue', Array.from(selected<%- schema.extra.Name %>Map.values()));
+  },
+);
+
+// 移除选中的<%- schema.description %>
+const removeSelected<%- schema.extra.Name %>Handle = (<%- schema.extra.name %>: OptimizeModel<<%- schema.name %>>) => {
+  <%- schema.extra.name %>SelectedKeys.value = <%- schema.extra.name %>SelectedKeys.value.filter(id => id !== <%- schema.extra.name %>.id);
+  selected<%- schema.extra.Name %>Map.delete(<%- schema.extra.name %>.id);
+};
+
+// 选择选中的<%- schema.description %>
+const selected<%- schema.extra.Name %>SelectedKeys = ref<number[]>([]);
+
+// 批量移除选中的<%- schema.description %>
+const batchRemoveSelected<%- schema.extra.Name %>Hint = computed(() => !selected<%- schema.extra.Name %>SelectedKeys.value.length ? '请选择<%- schema.description %>' : '');
+const batchRemoveSelected<%- schema.extra.Name %>Disabled = computed(() => !!batchRemoveSelected<%- schema.extra.Name %>Hint.value);
+const batchRemoveSelected<%- schema.extra.Name %>Handle = () => {
+  <%- schema.extra.name %>SelectedKeys.value = <%- schema.extra.name %>SelectedKeys.value
+    .filter(id => !selected<%- schema.extra.Name %>SelectedKeys.value.includes(id));
+  Array
+    .from(selected<%- schema.extra.Name %>Map.keys())
+    .filter(id => selected<%- schema.extra.Name %>SelectedKeys.value.includes(id))
+    .forEach(id => {
+      selected<%- schema.extra.Name %>Map.delete(id);
+    });
+};
+</script>
+
+<style lang="less" scoped>
+:deep(.@{prefix}-tabs-nav) {
+  display: v-bind('<%- schema.extra.name %>TabStyle.navDisplay');
+}
+
+:deep(.@{prefix}-tabs-content) {
+  padding-top: v-bind('<%- schema.extra.name %>TabStyle.contentPaddingTop');
+}
+
+.@{prefix}-table {
+  margin-top: 8px;
+}
+</style>

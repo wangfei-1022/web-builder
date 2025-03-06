@@ -1,0 +1,621 @@
+<template>
+  <AForm ref="form" :model="formValue" style="height: 100%;">
+    <ASpace v-if="dynamicRow" :size="type === 'inset' ? [0, 'small'] : undefined" wrap>
+      <template v-if="type === 'inset'" #split>
+        <ADivider direction="vertical" :margin="4" />
+      </template>
+      <AButton :style="type === 'inset' ? { padding: '0 4px' } : undefined"
+               :type="type === 'inset' ? 'text' : 'primary'"
+               @click="addFormItemHandle()">
+        <template #icon>
+          <IconPlus />
+        </template>添加
+      </AButton>
+      <APopconfirm content="是否确定移除选中行？"
+                   type="warning"
+                   :okButtonProps="{
+                     type: 'secondary',
+                     status: 'danger',
+                   }"
+                   @ok="batchRemoveFormItemHandle">
+        <AButton :style="type === 'inset' ? { padding: '0 4px' } : undefined"
+                 :type="type === 'inset' ? 'text' : undefined"
+                 status="danger"
+                 :title="selectFormItemHint"
+                 :disabled="selectFormItemDisabled">
+          <template #icon>
+            <IconMinus />
+          </template>移除
+        </AButton>
+      </APopconfirm>
+    </ASpace>
+
+    <ATable tableLayoutFixed
+            size="small"
+            :bordered="false"
+            :scroll="{ x: '100%', maxHeight: tableMaxHeight }"
+            columnResizable
+            :data="formValue.items"
+            rowKey="id"
+            :pagination="{
+              showTotal,
+              pageSize: formValue.items.length,
+              pageItemStyle: { display: 'none' },
+              activePageItemStyle: { display: 'none' },
+            }"
+            :rowSelection="{
+              type: 'checkbox',
+              showCheckedAll: true,
+              width: 40,
+              fixed: true,
+            }"
+            v-model:selectedKeys="formItemSelectedKeys">
+      <template #columns>
+<%_ 
+  schema.properties
+    .filter(({ name, extra }) => !/^(id|entityUuid|.+Id|createdBy|createdTime|lastModifiedBy|lastModifiedTime)$/.test(name) && !/^(file|image)$/.test(extra.inputRender))
+    .forEach(({ name, description, type, format, rules, extra }) => {
+_%>
+        <ATableColumn title="<%- description %>"
+                      :width="<%- (typeof extra.width === 'number' ? extra.width : format === 'date-time' ? 180 : 200) + 16 * 2 + 12 * 2 %>"
+                      :filterable="batchUpdateFormItemEnabled">
+          <template #filter-icon>
+            <IconEdit />
+          </template>
+          <template #filter-content="{ handleFilterConfirm }">
+            <AResizeBox class="batch-form-item-dropdown"
+                        style="width: <%- (typeof extra.width === 'number' ? extra.width : format === 'date-time' ? 180 : 200) + 16 * 2 + 12 * 2 %>px;"
+                        :directions="['left', 'right']">
+              <ASpace class="batch-form-item-dropdown-content" direction="vertical" fill>
+  <%_ if (extra.inputRender === 'number' || (!extra.inputRender && type === 'number')) { _%>
+                <AInputNumber placeholder="请输入"
+                              v-model="formValue.update.<%- name %>"
+                              :precision="<%- format === 'bigdecimal' ? 2 : 0 %>"
+                              :formatter="numberFormatter"
+                              :parser="numberParser"
+                              allowClear />
+  <%_ } else if (extra.inputRender === 'boolean' || (!extra.inputRender && type === 'boolean')) { _%>
+                <ARadioGroup v-model="formValue.update.<%- name %>">
+                  <ARadio :value="true">是</ARadio>
+                  <ARadio :value="false">否</ARadio>
+                </ARadioGroup>
+  <%_ } else if (extra.inputRender === 'datetime' || (!extra.inputRender && format === 'date-time')) { _%>
+                <ADatePicker placeholder="请选择"
+                             style="width: 100%;"
+                             v-model="formValue.update.<%- name %>"
+                             showTime
+                             allowClear />
+  <%_ } else if (extra.inputRender === 'date' || (!extra.inputRender && format === 'date')) { _%>
+                <ADatePicker placeholder="请选择"
+                             style="width: 100%;"
+                             v-model="formValue.update.<%- name %>"
+                             allowClear />
+  <%_ } else if (/^select(Multiple(Create)?)?$/.test(extra.inputRender) || (!extra.inputRender && (extra.options || extra.optionsFromDict || extra.optionsFromEntity))) { _%>
+                <ASelect placeholder="请选择"
+                         :triggerProps="{ autoFitPopupMinWidth: true }"
+    <%_ if (extra.options) { _%>
+                         :options="<%- JSON.stringify(extra.options, undefined, '  ').replace(/\n\]$/, ',\n]').replace(/(?<=\n)/g, ' '.repeat(25)).replace(/'/g, '\\\'').replace(/(?<!\\)"/g, '\'') %>"
+    <%_ } else if (extra.optionsFromDict) { _%>
+                         :loading="dictItemRequest.record.<%- extra.optionsFromDict %>?.loading"
+                         :options="dictItemRequest.record.<%- extra.optionsFromDict %>?.data"
+    <%_ } else if (extra.optionsFromEntity) { _%>
+                         :loading="<%- extra.optionsFromEntity.name %>Request.loading"
+                         :options="<%- extra.optionsFromEntity.name %>Request.data"
+                         :fieldNames="{ label: '<%- extra.optionsFromEntity.field %>', value: '<%- extra.optionsFromEntity.field %>' }"
+    <%_ } _%>
+                         v-model="formValue.update.<%- name %>"
+    <%_ if (/^selectMultiple(Create)?$/.test(extra.inputRender)) { _%>
+                         multiple
+    <%_ } _%>
+                         allowClear
+    <%_ if (extra.inputRender === 'selectMultipleCreate') { _%>
+                         allowCreate
+    <%_ } _%>
+    <%_ if (extra.optionsFromEntity) { _%>
+                         allowSearch
+                         :filterOption="false"
+                         @focus="<%- extra.optionsFromEntity.name %>Request.load()"
+                         @search="<%- extra.optionsFromEntity.name %>Request.load" />
+    <%_ } else { _%>
+                         allowSearch />
+    <%_ } _%>
+  <%_ } else if (extra.inputRender === 'autoComplete') { _%>
+                <AAutoComplete placeholder="请输入"
+                               :triggerProps="{ autoFitPopupMinWidth: true }"
+    <%_ if (extra.options) { _%>
+                               :data="<%- JSON.stringify(extra.options, undefined, '  ').replace(/\n\]$/, ',\n]').replace(/(?<=\n)/g, ' '.repeat(31)).replace(/'/g, '\\\'').replace(/(?<!\\)"/g, '\'') %>"
+    <%_ } else if (extra.optionsFromDict) { _%>
+                               :loading="dictItemRequest.record.<%- extra.optionsFromDict %>?.loading"
+                               :data="dictItemRequest.record.<%- extra.optionsFromDict %>?.data"
+    <%_ } else if (extra.optionsFromEntity) { _%>
+                               :loading="<%- extra.optionsFromEntity.name %>Request.loading"
+                               :data="<%- extra.optionsFromEntity.name %>Request.data"
+                               :fieldNames="{ label: '<%- extra.optionsFromEntity.field %>', value: '<%- extra.optionsFromEntity.field %>' }"
+    <%_ } _%>
+                               v-model="formValue.update.<%- name %>"
+    <%_ if (extra.optionsFromEntity) { _%>
+                               allowClear
+                               :filterOption="false"
+                               @search="<%- extra.optionsFromEntity.name %>Request.load" />
+    <%_ } else { _%>
+                               allowClear />
+    <%_ } _%>
+  <%_ } else if (extra.inputRender === 'radio') { _%>
+                <ARadioGroup v-model="formValue.update.<%- name %>">
+    <%_ if (extra.options) { _%>
+      <%_ extra.options.forEach(option => { _%>
+                  <ARadio value="<%- option %>"><%- option %></ARadio>
+      <%_ }) _%>
+    <%_ } else if (extra.optionsFromDict) { _%>
+                  <ASpin v-if="dictItemRequest.record.<%- extra.optionsFromDict %>?.loading" :size="16" />
+                  <template v-else>
+                    <ARadio v-for="{ label, value } in dictItemRequest.record.<%- extra.optionsFromDict %>?.data" :key="label" :value="value">{{ label }}</ARadio>
+                  </template>
+    <%_ } else if (extra.optionsFromEntity) { _%>
+                  <ASpin v-if="<%- extra.optionsFromEntity.name %>Request.loading" :size="16" />
+                  <template v-else>
+                    <ARadio v-for="{ <%- extra.optionsFromEntity.field %> } in <%- extra.optionsFromEntity.name %>Request.data" :key="<%- extra.optionsFromEntity.field %>" :value="<%- extra.optionsFromEntity.field %>">{{ <%- extra.optionsFromEntity.field %> }}</ARadio>
+                  </template>
+    <%_ } _%>
+                </ARadioGroup>
+  <%_ } else if (extra.inputRender === 'inputTag') { _%>
+                <AInputTag placeholder="请输入"
+                           v-model="formValue.update.<%- name %>"
+                           allowClear />
+  <%_ } else if (extra.inputRender === 'checkbox') { _%>
+                <ACheckboxGroup v-model="formValue.update.<%- name %>">
+    <%_ if (extra.options) { _%>
+      <%_ extra.options.forEach(option => { _%>
+                  <ACheckbox value="<%- option %>"><%- option %></ACheckbox>
+      <%_ }) _%>
+    <%_ } else if (extra.optionsFromDict) { _%>
+                  <ASpin v-if="dictItemRequest.record.<%- extra.optionsFromDict %>?.loading" :size="16" />
+                  <template v-else>
+                    <ACheckbox v-for="{ label, value } in dictItemRequest.record.<%- extra.optionsFromDict %>?.data" :key="label" :value="value">{{ label }}</ACheckbox>
+                  </template>
+    <%_ } else if (extra.optionsFromEntity) { _%>
+                  <ASpin v-if="<%- extra.optionsFromEntity.name %>Request.loading" :size="16" />
+                  <template v-else>
+                    <ACheckbox v-for="{ <%- extra.optionsFromEntity.field %> } in <%- extra.optionsFromEntity.name %>Request.data" :key="<%- extra.optionsFromEntity.field %>" :value="<%- extra.optionsFromEntity.field %>">{{ <%- extra.optionsFromEntity.field %> }}</ACheckbox>
+                  </template>
+    <%_ } _%>
+                </ACheckboxGroup>
+  <%_ } else if (extra.inputRender === 'textarea') { _%>
+                <ATextarea placeholder="请输入"
+                           v-model="formValue.update.<%- name %>"
+                           allowClear />
+  <%_ } else if (type === 'string') { _%>
+                <AInput placeholder="请输入"
+                        v-model="formValue.update.<%- name %>"
+                        allowClear />
+  <%_ } else { _%>
+                <ASelect placeholder="请选择"
+                         :triggerProps="{ autoFitPopupMinWidth: true }"
+                         v-model="formValue.update.<%- name %>"
+    <%_ if (type.endsWith('[]')) { _%>
+                         multiple
+    <%_ } _%>
+                         allowClear
+                         allowSearch />
+  <%_ } _%>
+                <ASpace>
+                  <AButton size="mini" @click="batchUpdateFormItemHandle(false, handleFilterConfirm)">更新全部</AButton>
+                  <AButton size="mini"
+                           type="primary"
+                           :title="selectFormItemHint"
+                           :disabled="selectFormItemDisabled"
+                           @click="batchUpdateFormItemHandle(true, handleFilterConfirm)">
+                    更新选中
+                  </AButton>
+                </ASpace>
+              </ASpace>
+            </AResizeBox>
+          </template>
+          <template #cell="{ record, rowIndex }">
+            <AFormItem hideLabel
+  <%_ if (rules.length) { _%>
+                       :field="`items.${rowIndex}.<%- name %>`"
+                       :rules="[
+    <%_ rules.forEach(({ type, key, value, message }) => { _%>
+                         { <% if (type) { %>type: '<%- type %>', <% } %><%- key %>: <%- value %>, message: '<%- message %>' },
+    <%_ }) _%>
+                       ]">
+  <%_ } else { _%>
+                       :field="`items.${rowIndex}.<%- name %>`">
+  <%_ } _%>
+  <%_ if (extra.inputRender === 'number' || (!extra.inputRender && type === 'number')) { _%>
+              <AInputNumber placeholder="请输入"
+                            v-model="record.<%- name %>"
+                            :precision="<%- format === 'bigdecimal' ? 2 : 0 %>"
+                            :formatter="numberFormatter"
+                            :parser="numberParser"
+                            allowClear />
+  <%_ } else if (extra.inputRender === 'boolean' || (!extra.inputRender && type === 'boolean')) { _%>
+              <ARadioGroup v-model="record.<%- name %>">
+                <ARadio :value="true">是</ARadio>
+                <ARadio :value="false">否</ARadio>
+              </ARadioGroup>
+  <%_ } else if (extra.inputRender === 'datetime' || (!extra.inputRender && format === 'date-time')) { _%>
+              <ADatePicker placeholder="请选择"
+                           style="width: 100%;"
+                           v-model="record.<%- name %>"
+                           showTime
+                           allowClear />
+  <%_ } else if (extra.inputRender === 'date' || (!extra.inputRender && format === 'date')) { _%>
+              <ADatePicker placeholder="请选择"
+                           style="width: 100%;"
+                           v-model="record.<%- name %>"
+                           allowClear />
+  <%_ } else if (/^select(Multiple(Create)?)?$/.test(extra.inputRender) || (!extra.inputRender && (extra.options || extra.optionsFromDict || extra.optionsFromEntity))) { _%>
+              <ASelect placeholder="请选择"
+                       :triggerProps="{ autoFitPopupMinWidth: true }"
+    <%_ if (extra.options) { _%>
+                       :options="<%- JSON.stringify(extra.options, undefined, '  ').replace(/\n\]$/, ',\n]').replace(/(?<=\n)/g, ' '.repeat(23)).replace(/'/g, '\\\'').replace(/(?<!\\)"/g, '\'') %>"
+    <%_ } else if (extra.optionsFromDict) { _%>
+                       :loading="dictItemRequest.record.<%- extra.optionsFromDict %>?.loading"
+                       :options="dictItemRequest.record.<%- extra.optionsFromDict %>?.data"
+    <%_ } else if (extra.optionsFromEntity) { _%>
+                       :loading="<%- extra.optionsFromEntity.name %>Request.loading"
+                       :options="<%- extra.optionsFromEntity.name %>Request.data"
+                       :fieldNames="{ label: '<%- extra.optionsFromEntity.field %>', value: '<%- extra.optionsFromEntity.field %>' }"
+    <%_ } _%>
+                       v-model="record.<%- name %>"
+    <%_ if (/^selectMultiple(Create)?$/.test(extra.inputRender)) { _%>
+                       multiple
+    <%_ } _%>
+                       allowClear
+    <%_ if (extra.inputRender === 'selectMultipleCreate') { _%>
+                       allowCreate
+    <%_ } _%>
+    <%_ if (extra.optionsFromEntity) { _%>
+                       allowSearch
+                       :filterOption="false"
+                       @focus="<%- extra.optionsFromEntity.name %>Request.load()"
+                       @search="<%- extra.optionsFromEntity.name %>Request.load" />
+    <%_ } else { _%>
+                       allowSearch />
+    <%_ } _%>
+  <%_ } else if (extra.inputRender === 'autoComplete') { _%>
+              <AAutoComplete placeholder="请输入"
+                             :triggerProps="{ autoFitPopupMinWidth: true }"
+    <%_ if (extra.options) { _%>
+                             :data="<%- JSON.stringify(extra.options, undefined, '  ').replace(/\n\]$/, ',\n]').replace(/(?<=\n)/g, ' '.repeat(29)).replace(/'/g, '\\\'').replace(/(?<!\\)"/g, '\'') %>"
+    <%_ } else if (extra.optionsFromDict) { _%>
+                             :loading="dictItemRequest.record.<%- extra.optionsFromDict %>?.loading"
+                             :data="dictItemRequest.record.<%- extra.optionsFromDict %>?.data"
+    <%_ } else if (extra.optionsFromEntity) { _%>
+                             :loading="<%- extra.optionsFromEntity.name %>Request.loading"
+                             :data="<%- extra.optionsFromEntity.name %>Request.data"
+                             :fieldNames="{ label: '<%- extra.optionsFromEntity.field %>', value: '<%- extra.optionsFromEntity.field %>' }"
+    <%_ } _%>
+                             v-model="record.<%- name %>"
+    <%_ if (extra.optionsFromEntity) { _%>
+                             allowClear
+                             :filterOption="false"
+                             @search="<%- extra.optionsFromEntity.name %>Request.load" />
+    <%_ } else { _%>
+                             allowClear />
+    <%_ } _%>
+  <%_ } else if (extra.inputRender === 'radio') { _%>
+              <ARadioGroup v-model="record.<%- name %>">
+    <%_ if (extra.options) { _%>
+      <%_ extra.options.forEach(option => { _%>
+                <ARadio value="<%- option %>"><%- option %></ARadio>
+      <%_ }) _%>
+    <%_ } else if (extra.optionsFromDict) { _%>
+                <ASpin v-if="dictItemRequest.record.<%- extra.optionsFromDict %>?.loading" :size="16" />
+                <template v-else>
+                  <ARadio v-for="{ label, value } in dictItemRequest.record.<%- extra.optionsFromDict %>?.data" :key="label" :value="value">{{ label }}</ARadio>
+                </template>
+    <%_ } else if (extra.optionsFromEntity) { _%>
+                <ASpin v-if="<%- extra.optionsFromEntity.name %>Request.loading" :size="16" />
+                <template v-else>
+                  <ARadio v-for="{ <%- extra.optionsFromEntity.field %> } in <%- extra.optionsFromEntity.name %>Request.data" :key="<%- extra.optionsFromEntity.field %>" :value="<%- extra.optionsFromEntity.field %>">{{ <%- extra.optionsFromEntity.field %> }}</ARadio>
+                </template>
+    <%_ } _%>
+              </ARadioGroup>
+  <%_ } else if (extra.inputRender === 'inputTag') { _%>
+              <AInputTag placeholder="请输入" 
+                         v-model="record.<%- name %>"
+                         allowClear />
+  <%_ } else if (extra.inputRender === 'checkbox') { _%>
+              <ACheckboxGroup v-model="record.<%- name %>">
+    <%_ if (extra.options) { _%>
+      <%_ extra.options.forEach(option => { _%>
+                <ACheckbox value="<%- option %>"><%- option %></ACheckbox>
+      <%_ }) _%>
+    <%_ } else if (extra.optionsFromDict) { _%>
+                <ASpin v-if="dictItemRequest.record.<%- extra.optionsFromDict %>?.loading" :size="16" />
+                <template v-else>
+                  <ACheckbox v-for="{ label, value } in dictItemRequest.record.<%- extra.optionsFromDict %>?.data" :key="label" :value="value">{{ label }}</ACheckbox>
+                </template>
+    <%_ } else if (extra.optionsFromEntity) { _%>
+                <ASpin v-if="<%- extra.optionsFromEntity.name %>Request.loading" :size="16" />
+                <template v-else>
+                  <ACheckbox v-for="{ <%- extra.optionsFromEntity.field %> } in <%- extra.optionsFromEntity.name %>Request.data" :key="<%- extra.optionsFromEntity.field %>" :value="<%- extra.optionsFromEntity.field %>">{{ <%- extra.optionsFromEntity.field %> }}</ACheckbox>
+                </template>
+    <%_ } _%>
+              </ACheckboxGroup>
+  <%_ } else if (extra.inputRender === 'textarea') { _%>
+              <ATextarea placeholder="请输入"
+                         v-model="record.<%- name %>"
+                         allowClear />
+  <%_ } else if (type === 'string') { _%>
+              <AInput placeholder="请输入"
+                      v-model="record.<%- name %>"
+                      allowClear />
+  <%_ } else { _%>
+              <ASelect placeholder="请选择"
+                       :triggerProps="{ autoFitPopupMinWidth: true }"
+                       v-model="record.<%- name %>"
+    <%_ if (type.endsWith('[]')) { _%>
+                       multiple
+    <%_ } _%>
+                       allowClear
+                       allowSearch />
+  <%_ } _%>
+            </AFormItem>
+          </template>
+        </ATableColumn>
+<%_ }) _%>
+        <ATableColumn v-if="dynamicRow" title="操作" :width="showCopy ? 118 : 72" fixed="right">
+          <template #cell="{ record, rowIndex }">
+            <ASpace :size="0">
+              <template #split>
+                <ADivider direction="vertical" :margin="4" />
+              </template>
+              <ALink v-if="showCopy" @click="copyFormItemHandle(record)">复制</ALink>
+              <APopconfirm content="移除该行数据？"
+                           type="warning"
+                           :okButtonProps="{
+                             type: 'secondary',
+                             status: 'danger',
+                           }"
+                           @ok="removeFormItemHandle(rowIndex)">
+                <ALink>移除</ALink>
+              </APopconfirm>
+            </ASpace>
+          </template>
+        </ATableColumn>
+      </template>
+    </ATable>
+  </AForm>
+</template>
+
+<script lang="ts" setup>
+<%_ Object.entries(imports).forEach(([name, { default: _default, values, types }]) => { _%>
+  <%_ if (_default || values.size) { _%>
+import <% if (_default) { %><%- _default %><% } %><% if (_default && (values.size || types.size)) { %>, <% } %><% if (values.size || types.size) { %>{ <% } %><%- Array.from(values).concat(Array.from(types).map(type => `type ${type}`)).join(', ') %><% if (values.size || types.size) { %> }<% } %> from '<%- name %>';
+  <%_ } else if (types.size) { _%>
+import type { <%- Array.from(types).join(', ') %> } from '<%- name %>';
+  <%_ } _%>
+<%_ }) _%>
+
+const form = ref<FormInstance>();
+
+// 定义属性
+const props = defineProps({
+  /** 表单补丁 */
+  patchs: Array as PropType<PartialModel<OptimizeModel<<%- schema.name %>>>[]>,
+  /** 动态行 */
+  dynamicRow: Boolean,
+  /** 类型 */
+  type: {
+    type: String as PropType<'common' | 'inset'>,
+    default: 'common',
+  },
+  /** 复制功能 */
+  showCopy: {
+    type: Boolean,
+    default: true,
+  },
+  /** 显示合计 */
+  showTotal: {
+    type: Boolean,
+    default: true,
+  },
+  /** 表格最大高度 */
+  tableMaxHeight: {
+    type: [Number, String],
+    default: '500px',
+  },
+});
+<%_ if (entity.dictCodes.length > 0) { _%>
+
+// 获取字典
+const dictItemRequest = useRequestRecord(
+  async (dictCode: string) => {
+    const { data } = await getAllDictItems({ dictCode });
+    return data.sort((a, b) => a.sequence - b.sequence);
+  },
+  {
+    recordKey: dictCode => dictCode,
+    onError: error => Message.error(getErrorMessage(error)),
+  },
+);
+<%_ } _%>
+<%_ entity.dictCodes.forEach(dictCode => { _%>
+dictItemRequest.load('<%- dictCode %>');
+<%_ }) _%>
+<%_ entity.entities.forEach(({ Names, name, description }) => { _%>
+
+// 获取<%- description %>
+const <%- name %>Request = useRequest(
+  async (keywords?: string) => {
+    const { data } = await getAll<%- Names %>({ keywords });
+    return data.map(item => {
+      return {
+        $raw: item,
+        ...cloneDeep(item),
+      };
+    });
+  },
+  {
+    manual: true,
+    onError: error => Message.error(getErrorMessage(error)),
+  },
+);
+<%_ }) _%>
+
+// 表单值
+const formItemInitialValue = {
+  /** 唯一标识 */
+  id: 0,
+<%_ 
+  schema.properties
+    .filter(({ name, extra }) => !/^(id|entityUuid|.+Id|createdBy|createdTime|lastModifiedBy|lastModifiedTime)$/.test(name) && !/^(file|image)$/.test(extra.inputRender))
+    .forEach(({ name, description, type, format, extra }) => { 
+_%>
+  /** <%- description %> */
+  <%_ if (/^(checkbox|inputTag|selectMultiple(Create)?)$/.test(extra.inputRender) && !type.endsWith('[]')) { _%>
+  <%- name %>: undefined as <%- type %>[] | undefined,
+  <%_ } else { _%>
+  <%- name %>: undefined as <%- type %> | undefined,
+  <%_ } _%>
+<%_ }) _%>
+};
+const formValue = reactive({
+  /** 更新 */
+  update: {} as PartialModel<typeof formItemInitialValue>,
+  /** 表单行 */
+  items: [] as typeof formItemInitialValue[],
+});
+const formTransform = useFormTransform<typeof formItemInitialValue, OptimizeModel<<%- schema.name %>>>([
+<%_
+  if (
+    schema.properties
+      .filter(({ name, extra }) => !/^(id|entityUuid|.+Id|createdBy|createdTime|lastModifiedBy|lastModifiedTime)$/.test(name) && !/^(file|image)$/.test(extra.inputRender))
+      .some(({ type, extra }) => /^(checkbox|inputTag|selectMultiple(Create)?)$/.test(extra.inputRender) && !type.endsWith('[]'))
+  ) {
+_%>
+  // 表单json处理
+  {
+    fields: [
+  <%_
+    schema.properties
+      .filter(({ name, extra }) => !/^(id|entityUuid|.+Id|createdBy|createdTime|lastModifiedBy|lastModifiedTime)$/.test(name) && !/^(file|image)$/.test(extra.inputRender))
+      .filter(({ type, extra }) => /^(checkbox|inputTag|selectMultiple(Create)?)$/.test(extra.inputRender) && !type.endsWith('[]'))
+      .forEach(({ name }) => {
+  _%>
+      '<%- name %>',
+  <%_ }) _%>
+    ],
+    toFormFieldValue: modelFieldValue => {
+      return parseJsonString(modelFieldValue);
+    },
+    toModelFieldValue: formFieldValue => {
+      return (formFieldValue ?? undefined) ? JSON.stringify(formFieldValue) : undefined;
+    },
+  },
+<%_ } _%>
+]);
+
+// 添加行
+const addFormItemHandle = (patch?: PartialModel<OptimizeModel<<%- schema.name %>>>) => {
+  formItemInitialValue.id--;
+  const newFormItemValue = cloneDeep(formItemInitialValue);
+  const formItemPatch = {
+    ...formTransform.toFormPatch(patch ?? {}),
+  };
+  updateForm(newFormItemValue, formItemPatch);
+  formValue.items.push(newFormItemValue);
+};
+
+// 复制行
+const copyFormItemHandle = (formItemValue: typeof formItemInitialValue) => {
+  const { id, ...patch } = formItemValue;
+  addFormItemHandle(patch);
+};
+
+// 移除行
+const removeFormItemHandle = (index: number) => {
+  const [formItemValue] = formValue.items.splice(index, 1);
+  formItemSelectedKeys.value = formItemSelectedKeys.value.filter(key => key !== formItemValue.id);
+};
+
+// 更新行关联值
+// const updateFormItemRelatedValueHandle = (formItemValue: PartialModel<typeof formItemInitialValue>, field: keyof typeof formItemInitialValue) => {
+// };
+
+// 选择行
+const formItemSelectedKeys = ref<number[]>([]);
+const selectFormItemHint = computed(() => !formItemSelectedKeys.value.length ? '请选择行' : '');
+const selectFormItemDisabled = computed(() => !!selectFormItemHint.value);
+
+// 批量移除行
+const batchRemoveFormItemHandle = () => {
+  formValue.items = formValue.items.filter(({ id }) => !formItemSelectedKeys.value.includes(id));
+  formItemSelectedKeys.value = [];
+};
+
+// 批量更新行
+const batchUpdateFormItemEnabled = {
+  filter: () => true,
+  alignLeft: true,
+  triggerProps: {
+    onPopupVisibleChange: () => {
+      formValue.update = {};
+    },
+  } as any,
+};
+const batchUpdateFormItemHandle = (selected: boolean, closeHandle: Function) => {
+  const formItemValues = selected
+    ? formValue.items.filter(({ id }) => formItemSelectedKeys.value.includes(id))
+    : formValue.items;
+  formItemValues.forEach(formItemValue => updateForm(formItemValue, formValue.update));
+  closeHandle();
+};
+
+// 更新表单值
+watch(
+  () => props.patchs,
+  () => {
+    formValue.items = [];
+    formItemSelectedKeys.value = [];
+    props.patchs?.forEach(addFormItemHandle);
+    if (formValue.items.length === 0) {
+      addFormItemHandle();
+    }
+  },
+  { immediate: true },
+);
+
+// 暴露实例
+defineExpose({
+  /**
+   * 校验表单
+   */
+  validate: async () => {
+    const errors = await form.value?.validate();
+    if (errors) throw errors;
+    const modelPatchs = formValue.items.map(({ id, ...formItemValue }) => {
+      const patch = {
+        id: id > 0 ? id : undefined,
+        ...formTransform.toModelPatch(formItemValue),
+      };
+      return patch as OptimizeForm<typeof patch, <%- schema.name %>>;
+    });
+    return modelPatchs;
+  },
+});
+</script>
+
+<style lang="less" scoped>
+.actions {
+  margin-bottom: 8px;
+}
+
+.batch-form-item-dropdown {
+  min-width: 186px;
+  background-color: @color-bg-popup;
+  border: 1px solid @color-fill-3;
+  border-left: none;
+  border-right: none;
+  border-radius: @border-radius-medium;
+  box-shadow: 0 4px 10px rgb(0 0 0 / 10%);
+}
+
+.batch-form-item-dropdown-content {
+  padding: 16px;
+}
+</style>
