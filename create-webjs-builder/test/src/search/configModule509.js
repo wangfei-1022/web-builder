@@ -1,0 +1,162 @@
+const searchData = [{
+  "itemType": "input",
+  "itemName": "actualPaymentNo",
+  "itemLabel": "实收付编号",
+  "itemValue": null,
+  "selected": 0,
+  "valueExpression": null,
+  "defaultSelected": 1,
+  "defaultValue": null
+}, {
+  "itemType": "date",
+  "subType": "daterange",
+  "itemName": "happenDate",
+  "itemLabel": "收付日期",
+  "itemValue": null,
+  "selected": 0,
+  "valueExpression": null,
+  "defaultSelected": 1,
+  "defaultValue": null
+}, {
+  "itemType": "customer",
+  "itemName": "customerId",
+  "itemLabel": "结算单位",
+  "itemValue": null,
+  "selected": 0,
+  "valueExpression": null,
+  "defaultSelected": 1,
+  "defaultValue": null
+}, {
+  "itemType": "currency",
+  "itemName": "currency",
+  "itemLabel": "币种",
+  "itemValue": null,
+  "selected": 0,
+  "valueExpression": null,
+  "defaultSelected": 1,
+  "defaultValue": null
+}, {
+  "itemType": "input",
+  "subType": "bigdecimalrange",
+  "itemName": "amount",
+  "itemLabel": "金额",
+  "itemValue": null,
+  "selected": 0,
+  "valueExpression": null,
+  "defaultSelected": 1,
+  "defaultValue": null
+}, {
+  "itemType": "input",
+  "itemName": "bankProofNo",
+  "itemLabel": "水单号",
+  "itemValue": null,
+  "selected": 0,
+  "valueExpression": null,
+  "defaultSelected": 1,
+  "defaultValue": null
+}, {
+  "itemType": "input",
+  "itemName": "ourBankName",
+  "itemLabel": "银行名称",
+  "itemValue": null,
+  "selected": 0,
+  "valueExpression": null,
+  "defaultSelected": 1,
+  "defaultValue": null
+}, {
+  "itemType": "input",
+  "itemName": "ourBankAccount",
+  "itemLabel": "银行账号",
+  "itemValue": null,
+  "selected": 0,
+  "valueExpression": null,
+  "defaultSelected": 1,
+  "defaultValue": null
+}, {
+  "itemType": "input",
+  "itemName": "bankCheckNo",
+  "itemLabel": "支票号",
+  "itemValue": null,
+  "selected": 0,
+  "valueExpression": null,
+  "defaultSelected": 0,
+  "defaultValue": null
+}, {
+  "itemType": "input",
+  "itemName": "companyBankProofNo",
+  "itemLabel": "对方水单号",
+  "itemValue": null,
+  "selected": 0,
+  "valueExpression": null,
+  "defaultSelected": 0,
+  "defaultValue": null
+}, {
+  "itemType": "date",
+  "subType": "daterange",
+  "itemName": "companyPayDate",
+  "itemLabel": "对方付款日期",
+  "itemValue": null,
+  "selected": 0,
+  "valueExpression": null,
+  "defaultSelected": 0,
+  "defaultValue": null
+}, {
+  "itemType": "select",
+  "itemName": "clearState",
+  "itemLabel": "核销状态",
+  "itemValue": null,
+  "selected": 0,
+  "valueExpression": {
+    "valueType": "static",
+    "valueContent": [{"label": "未核销", "value": "0"}, {"label": "部分核销", "value": "1"}, {
+      "label": "完全核销",
+      "value": "2"
+    }, {"label": "超额核销", "value": "3"}]
+  },
+  "defaultSelected": 1,
+  "defaultValue": null
+}, {
+  "itemType": "select",
+  "multiple": 0,
+  "itemName": "bPrepay",
+  "itemLabel": "是否预付",
+  "itemValue": null,
+  "selected": 0,
+  "valueExpression": {"valueType": "static", "valueContent": [{"label": "是", "value": 1}, {"label": "否", "value": 0}]},
+  "defaultSelected": 1,
+  "defaultValue": null
+}, {
+  "itemType": "select",
+  "multiple": 0,
+  "itemName": "clearType",
+  "itemLabel": "结算方式",
+  "itemValue": null,
+  "selected": 0,
+  "valueExpression": {
+    "valueType": "static",
+    "valueContent": [{"label": "支票", "value": 1}, {"label": "转账", "value": 2}, {"label": "现金", "value": 3}]
+  },
+  "defaultSelected": 1,
+  "defaultValue": null
+}, {
+  "itemType": "user",
+  "itemName": "createBy",
+  "itemLabel": "创建人",
+  "itemValue": null,
+  "selected": 0,
+  "valueExpression": null,
+  "defaultSelected": 1,
+  "defaultValue": null
+}, {
+  "itemType": "date",
+  "subType": "daterange",
+  "itemName": "createTime",
+  "itemLabel": "创建日期",
+  "itemValue": null,
+  "selected": 0,
+  "valueExpression": null,
+  "defaultSelected": 1,
+  "defaultValue": null
+}]
+
+export default searchData

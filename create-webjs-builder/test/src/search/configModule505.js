@@ -1,0 +1,304 @@
+const searchData = [{
+  "itemType": "input",
+  "itemName": "applyNo",
+  "itemLabel": "收付款编号",
+  "itemValue": null,
+  "selected": 0,
+  "valueExpression": null,
+  "defaultSelected": 1,
+  "defaultValue": null
+}, {
+  "itemType": "date",
+  "subType": "daterange",
+  "itemName": "createDate",
+  "itemLabel": "创建时间",
+  "itemValue": null,
+  "selected": 0,
+  "valueExpression": null,
+  "defaultSelected": 0,
+  "defaultValue": null
+}, {
+  "itemType": "customer",
+  "itemName": "customerId",
+  "itemLabel": "结算单位",
+  "itemValue": null,
+  "selected": 0,
+  "valueExpression": null,
+  "defaultSelected": 1,
+  "defaultValue": null
+}, {
+  "itemType": "input",
+  "itemName": "invoiceTitle",
+  "itemLabel": "发票抬头",
+  "itemValue": null,
+  "selected": 0,
+  "valueExpression": null,
+  "defaultSelected": 0,
+  "defaultValue": null
+}, {
+  "itemType": "currency",
+  "itemName": "currency",
+  "itemLabel": "申请单币种",
+  "itemValue": null,
+  "selected": 0,
+  "valueExpression": null,
+  "defaultSelected": 1,
+  "defaultValue": null
+}, {
+  "itemType": "select",
+  "multiple": 0,
+  "itemName": "arAp",
+  "itemLabel": "收付方向",
+  "itemValue": null,
+  "selected": 0,
+  "valueExpression": {
+    "valueType": "static",
+    "valueContent": [{"label": "收", "value": "1"}, {"label": "付", "value": "2"}]
+  },
+  "defaultSelected": 1,
+  "defaultValue": null
+}, {
+  "itemType": "input",
+  "subType": "bigdecimalrange",
+  "itemName": "applyAmount",
+  "itemLabel": "申请金额",
+  "itemValue": null,
+  "selected": 0,
+  "valueExpression": null,
+  "defaultSelected": 1,
+  "defaultValue": null
+}, {
+  "itemType": "user",
+  "itemName": "applyBy",
+  "itemLabel": "申请人",
+  "itemValue": null,
+  "selected": 0,
+  "valueExpression": null,
+  "defaultSelected": 1,
+  "defaultValue": null
+}, {
+  "itemType": "date",
+  "subType": "daterange",
+  "itemName": "applyDate",
+  "itemLabel": "申请日期",
+  "itemValue": null,
+  "selected": 0,
+  "valueExpression": null,
+  "defaultSelected": 1,
+  "defaultValue": null
+}, {
+  "itemType": "select",
+  "itemName": "paymentState",
+  "itemLabel": "申请状态",
+  "itemValue": "",
+  "selected": 0,
+  "valueExpression": {
+    "valueType": "static",
+    "valueContent": [{"label": "未提交", "value": 0}, {"label": "提交", "value": 1}, {"label": "审核", "value": 2}]
+  },
+  "defaultSelected": 1
+}, {
+  "itemType": "office",
+  "itemName": "officeId",
+  "itemLabel": "所属公司",
+  "itemValue": null,
+  "selected": 0,
+  "valueExpression": null,
+  "defaultSelected": 1,
+  "defaultValue": null
+}, {
+  "itemType": "select",
+  "itemName": "jobState",
+  "itemLabel": "业务状态",
+  "itemValue": "",
+  "selected": 0,
+  "valueExpression": {
+    "valueType": "static",
+    "valueContent": [{"label": "未提交", "value": 0}, {"label": "待审核", "value": 1}, {
+      "label": "已驳回",
+      "value": 2
+    }, {"label": "已审核", "value": 3}, {"label": "已完成", "value": 4}]
+  },
+  "defaultSelected": 1
+}, {
+  "itemType": "select",
+  "itemName": "jobType",
+  "itemLabel": "业务类型",
+  "itemValue": null,
+  "selected": 0,
+  "valueExpression": {
+    "valueType": "static",
+    "valueContent": [{"label": "海运出口", "value": "1"}, {"label": "海运进口", "value": "2"}, {
+      "label": "空运出口",
+      "value": "3"
+    }, {"label": "空运出口", "value": "4"}]
+  },
+  "defaultSelected": 1,
+  "defaultValue": null
+}, {
+  "itemType": "input",
+  "itemName": "jobNo",
+  "itemLabel": "业务编号",
+  "itemValue": null,
+  "selected": 0,
+  "valueExpression": null,
+  "defaultSelected": 1,
+  "defaultValue": null
+}, {
+  "itemType": "customer",
+  "subType": {"range": ["b_customer"]},
+  "itemName": "bookingCustomerId",
+  "itemLabel": "委托单位",
+  "itemValue": "",
+  "selected": 0,
+  "valueExpression": "",
+  "defaultSelected": 1
+}, {
+  "itemType": "input",
+  "itemName": "mblNo",
+  "itemLabel": "主单号",
+  "itemValue": null,
+  "selected": 0,
+  "valueExpression": null,
+  "defaultSelected": 1,
+  "defaultValue": null
+}, {
+  "itemType": "input",
+  "itemName": "hblNo",
+  "itemLabel": "分单号",
+  "itemValue": null,
+  "selected": 0,
+  "valueExpression": null,
+  "defaultSelected": 1,
+  "defaultValue": null
+}, {
+  "itemType": "input",
+  "itemName": "soNo",
+  "itemLabel": "关单号",
+  "itemValue": null,
+  "selected": 0,
+  "valueExpression": null,
+  "defaultSelected": 1,
+  "defaultValue": null
+}, {
+  "itemType": "input",
+  "itemName": "masterJobNo",
+  "itemLabel": "主票工作号",
+  "itemValue": null,
+  "selected": 0,
+  "valueExpression": null,
+  "defaultSelected": 0,
+  "defaultValue": null
+}, {
+  "itemType": "date",
+  "subType": "daterange",
+  "itemName": "businessDate",
+  "itemLabel": "业务日期",
+  "itemValue": "",
+  "selected": 0,
+  "valueExpression": "",
+  "defaultSelected": 1
+}, {
+  "itemType": "date",
+  "subType": "daterange",
+  "itemName": "ETD",
+  "itemLabel": "ETD",
+  "itemValue": "",
+  "selected": 0,
+  "valueExpression": "",
+  "defaultSelected": 1
+}, {
+  "itemType": "date",
+  "subType": "daterange",
+  "itemName": "ETA",
+  "itemLabel": "ETA",
+  "itemValue": "",
+  "selected": 0,
+  "valueExpression": "",
+  "defaultSelected": 1
+}, {
+  "itemType": "date",
+  "subType": "daterange",
+  "itemName": "accountDate",
+  "itemLabel": "财务日期",
+  "itemValue": "",
+  "selected": 0,
+  "valueExpression": "",
+  "defaultSelected": 1
+}, {
+  "itemType": "user",
+  "itemName": "saleById",
+  "itemLabel": "销售人员",
+  "itemValue": "",
+  "selected": 0,
+  "valueExpression": "",
+  "defaultSelected": 1
+}, {
+  "itemType": "department",
+  "itemName": "saleDepartmentId",
+  "itemLabel": "销售部门",
+  "itemValue": "",
+  "selected": 0,
+  "valueExpression": "",
+  "defaultSelected": 1
+}, {
+  "itemType": "user",
+  "itemName": "opById",
+  "itemLabel": "操作人员",
+  "itemValue": "",
+  "selected": 0,
+  "valueExpression": "",
+  "defaultSelected": 1
+}, {
+  "itemType": "department",
+  "itemName": "opDepartmentId",
+  "itemLabel": "操作部门",
+  "itemValue": "",
+  "selected": 0,
+  "valueExpression": "",
+  "defaultSelected": 1
+}, {
+  "itemType": "select",
+  "itemName": "clearState",
+  "itemLabel": "核销状态",
+  "itemValue": null,
+  "selected": 0,
+  "valueExpression": {
+    "valueType": "static",
+    "valueContent": [{"label": "未核销", "value": "0"}, {"label": "部分核销", "value": "1"}, {
+      "label": "完全核销",
+      "value": "2"
+    }, {"label": "超额核销", "value": "3"}]
+  },
+  "defaultSelected": 0,
+  "defaultValue": null
+}, {
+  "itemType": "input",
+  "itemName": "invoiceNo",
+  "itemLabel": "发票号",
+  "itemValue": null,
+  "selected": 0,
+  "valueExpression": null,
+  "defaultSelected": 0,
+  "defaultValue": null
+}, {
+  "itemType": "input",
+  "itemName": "billNo",
+  "itemLabel": "账单号",
+  "itemValue": null,
+  "selected": 0,
+  "valueExpression": null,
+  "defaultSelected": 0,
+  "defaultValue": null
+}, {
+  "itemType": "input",
+  "itemName": "statementNo",
+  "itemLabel": "对账号",
+  "itemValue": null,
+  "selected": 0,
+  "valueExpression": null,
+  "defaultSelected": 0,
+  "defaultValue": null
+}]
+
+export default searchData

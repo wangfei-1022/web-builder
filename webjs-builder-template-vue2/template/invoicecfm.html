@@ -1,0 +1,461 @@
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>费用确认</title>
+  <style>
+    input {
+      color: #4E85BC
+    }
+
+    textarea {
+      color: #4E85BC
+    }
+
+    .div_main {
+      margin: 0 auto;
+      width: 980px;
+      overflow: hidden;
+      border: 1px solid grey;
+      background-color: white
+    }
+
+    .div_1 {
+      width: 50%;
+      float: left;
+      margin: 2px
+    }
+
+    .div_1_1 {
+      border: 1px dotted grey;
+      background-color: white;
+      margin: 2px;
+      padding: 2px
+    }
+
+    .div_2 {
+      width: 50%;
+      width: 48%;
+      float: right;
+      margin: 4px
+    }
+
+    .div_2_1 {
+      padding: 5px;
+      text-align: right;
+      margin-right: 20px;
+      width: 450px;
+      background-color: #ebedce;
+      font-size: 25px;
+      border: 0px solid #32A01C
+    }
+
+    .div_2_2 {
+      margin-top: 20px;
+      float: left;
+      width: 40%
+    }
+
+    .div_2_2_1 {
+      border-bottom: 1px solid grey;
+      color: #327AAE;
+    }
+
+    .div_3 {
+      width: 966px;
+      float: left;
+      margin: 4px;
+      border: 1px dotted grey
+    }
+
+    .div_3_1 {
+      margin: 5px;
+      float: left;
+      width: 18.5%
+    }
+
+    .div_3_1_1 {
+      font-size: 13px;
+      color: #525252;
+    }
+
+    .tb_name {
+      font-size: 14px;
+      color: #525252;
+      border-bottom: 1px solid grey
+    }
+
+    .tb_value {
+      font-size: 16px;
+      color: #3A71A8;
+      border-bottom: 1px solid grey
+    }
+
+    .div_4 {
+      width: 966px;
+      float: left;
+      margin: 4px;
+      border: 0px dotted grey
+    }
+
+    .div_4_1 {
+      margin: 5px;
+      float: left;
+    }
+
+    .div_5 {
+      width: 966px;
+      float: left;
+      margin: 4px;
+      border: 1px dotted grey
+    }
+
+    .div_5_1 {
+      font-size: 12px;
+      color: grey;
+    }
+
+    .div_5_2 {
+      width: 110px
+    }
+
+    .div_top {
+      padding-top: 10px;
+      padding-bottom: 5px;
+      background-color: #fdf9cd;
+      font-size: 12px;
+      margin: 0 auto;
+      width: 980px;
+      top: 0px;
+      position: sticky;
+      border-top: 1px solid grey;
+      border-left: 1px solid grey;
+      border-right: 1px solid grey;
+      border-bottom: 1px solid grey;
+    }
+
+    .div_bottom {
+      margin: 0 auto;
+      width: 980px;
+      height: 40px;
+      border: 1px solid grey;
+      background-color: #E3E3E3
+    }
+
+    .f_submitBtn {
+      display: inline-block;
+      line-height: 28px;
+      padding: 0 20px;
+      font-size: 13px;
+      text-align: center;
+      color: #FFF;
+      background-color: #0054a6;
+      border-radius: 2px;
+    }
+
+  </style>
+
+
+</head>
+<body style="background-color:#F7F7F7">
+
+<div id="render-content">
+
+</div>
+
+
+<div class="div_bottom">
+  <div style="float: left;font-size: 14px;color: grey;margin-left: 20px;margin-top: 10px">Powered by YHT</div>
+  <div>
+    <a style="float: right;font-size: 14px;color: #3A71A8;margin-right: 20px;margin-top: 10px">如何使用在线费用确认功能?</a>
+  </div>
+</div>
+</body>
+<script type="text/x-handlebars-template" id="render-template">
+  <div class="div_top" style="overflow: hidden">
+    <div style="float: left;font-size: 16px;color: grey;margin-left: 20px">费用确认</div>
+
+    <div style="float: right">
+      {{#if actBillOnLineVO.bAllowConfirm}}
+      <div class="f_submitBtn" style="float:left;background:#C0C0C0">{{actBillOnLineVO.confirmStateDesc}}</div>
+      {{/if}}
+      {{#if actBillOnLineVO.bAllowConfirm}}
+        <div class="f_submitBtn" onclick="return saveStageConfirm();">暂存(Save)</div> &nbsp;&nbsp;&nbsp;
+        <div class="f_submitBtn" onclick="return invoiceConfirm(true);">确认(Confirm)</div> &nbsp;&nbsp;&nbsp;
+        <div class="f_submitBtn" style="background: darkred" onclick="return showRefuseInput()" id="btnRefuse">拒绝(Refuse)&nbsp;&nbsp;&nbsp;</div>
+        <div class="f_submitBtn" style="background: darkred;display: none;" onclick="return invoiceConfirm(false)"
+             id="btnRefuseSubmit">拒绝(Refuse)&nbsp;&nbsp;&nbsp;
+        </div>
+        <!--<div class="f_submitBtn">导出PDF(Save as PDF)</div> &nbsp;&nbsp;&nbsp;-->
+     {{/if}}
+    </div>
+    <div style="margin-top: 40px;margin-left: 10px; display: none" id="divReson">
+    <textarea id="reson" name="reson" style="width: 960px"
+              rows="3">确认回执说明：{{actBillOnLineVO.rejectConfirmReason}}</textarea>
+    </div>
+  </div>
+  <form>
+    <div>
+      <div class="div_main">
+
+        <div class="div_4" style="text-align: center;border-bottom: 2px solid #000">
+          <div style="font-size: 20px">{{actBillOnLineVO.myCompanyName}}</div>
+          <div style="font-size: 12px;margin-top: 5px">地址：{{actBillOnLineVO.myCompanyAddress}}</div>
+          <div style="font-size: 12px">TEL：{{actBillOnLineVO.myCompanyTel}} FAX：{{actBillOnLineVO.myCompanyFax}}</div>
+        </div>
+        <div class="div_4" style="text-align: center">
+          <div style="font-size: 24px">费用确认通知书</div>
+        </div>
+        <div class="div_4">
+          <div class="div_4_1">
+            <div class="div_3_1_1">TO：
+            </div>
+            <div style="margin-left: 30px">
+              <div style="font-size: 18px">
+                {{actBillOnLineVO.customerName}}
+              </div>
+              <div style="font-size: 12px;margin-top: 5px">
+                联系人：{{actBillOnLineVO.custContact}} 电话：{{actBillOnLineVO.custMobile}} 邮箱：{{actBillOnLineVO.custEmail}}
+                <br/>
+                {{actBillOnLineVO.address}}
+              </div>
+            </div>
+          </div>
+          <div class="div_4_1" style="float: right">
+            <div class="div_3_1_1">制单日期：{{actBillOnLineVO.billDate}}
+            </div>
+          </div>
+        </div>
+        <div class="div_3">
+          <table style="width: 100%;" cellpadding="2" cellspacing="0">
+            <tr>
+              <td class="tb_name" width="20%">工 作 号</td>
+              <td class="tb_value" width="30%">{{actBillOnLineVO.jobRelevantVO.jobNo}}</td>
+              <td class="tb_name" width="20%">客户编号</td>
+              <td class="tb_value" width="30%">{{actBillOnLineVO.jobRelevantVO.customerJobNo}}</td>
+            </tr>
+            <tr>
+              <td class="tb_name" width="20%">MB/L No.</td>
+              <td class="tb_value" width="30%">{{actBillOnLineVO.jobRelevantVO.mblNo}}</td>
+              <td class="tb_name" width="20%">开航日期</td>
+              <td class="tb_value" width="30%">{{actBillOnLineVO.jobRelevantVO.etdString}}</td>
+            </tr>
+            <tr>
+              <td class="tb_name" width="20%">HB/L No.</td>
+              <td class="tb_value" width="30%">{{actBillOnLineVO.jobRelevantVO.hblNo}}</td>
+              <td class="tb_name" width="20%">件 数</td>
+              <td class="tb_value" width="30%">{{actBillOnLineVO.jobRelevantVO.actualQuantity}}
+                {{actBillOnLineVO.jobRelevantVO.packageType}}
+              </td>
+            </tr>
+            <tr>
+              <td class="tb_name" width="20%">船名航次</td>
+              <td class="tb_value" width="30%">{{actBillOnLineVO.jobRelevantVO.vessel}} /
+                {{actBillOnLineVO.jobRelevantVO.voyage}}
+              </td>
+              <td class="tb_name" width="20%">毛 重</td>
+              <td class="tb_value" width="30%">{{actBillOnLineVO.jobRelevantVO.actualGrossWeight}} KGS</td>
+            </tr>
+            <tr>
+              <td class="tb_name" width="20%">起 运 港</td>
+              <td class="tb_value" width="30%">{{actBillOnLineVO.jobRelevantVO.pol}}</td>
+              <td class="tb_name" width="20%">体 积</td>
+              <td class="tb_value" width="30%">{{actBillOnLineVO.jobRelevantVO.actualVolume}}CBM</td>
+            </tr>
+            <tr>
+              <td class="tb_name" width="20%">卸 货 港</td>
+              <td class="tb_value" width="30%">{{actBillOnLineVO.jobRelevantVO.pod}}</td>
+              <td class="tb_name" width="20%">箱型箱量</td>
+              <td class="tb_value" width="30%">{{actBillOnLineVO.jobRelevantVO.ctnrNote}}</td>
+            </tr>
+            <tr>
+              <td class="tb_name" width="20%">目 的 港</td>
+              <td class="tb_value" width="30%">{{actBillOnLineVO.jobRelevantVO.destination}}</td>
+              <td class="tb_name" width="20%">最终目的地</td>
+              <td class="tb_value" width="30%">{{actBillOnLineVO.jobRelevantVO.destination}}</td>
+            </tr>
+          </table>
+        </div>
+        <div class="div_4">
+          <div class="div_4_1">
+            <div class="div_3_1_1">温馨提示：<br/>
+              1、新客户需要买单，请及时确认费用，请通知我司开票！<br/>
+              2、协议客户请凭此正本费用确认书和提单申领保函来我司领取当票提单，此费用一经确认不做任何更改。若后续有额外费用产生，我司会在月结对账中与贵司另行核对。
+            </div>
+
+          </div>
+        </div>
+
+        <div class="div_3">
+          <table style="width: 100%;font-size: 14px" cellpadding="2" cellspacing="0">
+            <tr>
+              <td style="border-bottom: 1px solid #000">费用名称</td>
+              <td style="border-bottom: 1px solid #000;text-align: right">数量</td>
+              <td style="border-bottom: 1px solid #000;text-align: center">单位</td>
+              <td style="border-bottom: 1px solid #000;text-align: right">单价</td>
+              <td style="border-bottom: 1px solid #000;text-align: center">P/C</td>
+              <td style="border-bottom: 1px solid #000;text-align: center">币种</td>
+              <td style="border-bottom: 1px solid #000;text-align: right">金额</td>
+            </tr>
+            {{#each actBillOnLineVO.chargeList}}
+                {{#if bCurrencyTotal}}
+                  <tr>
+                    <td style="border-top: 1px solid #000;border-bottom: 1px dotted gray;text-align: center;font-weight: bold"></td>
+                    <td style="border-top: 1px solid #000;border-bottom: 1px dotted gray;text-align: center;font-weight: bold"></td>
+                    <td style="border-top: 1px solid #000;border-bottom: 1px dotted gray;text-align: center;font-weight: bold"></td>
+                    <td style="border-top: 1px solid #000;border-bottom: 1px dotted gray;text-align: center;font-weight: bold"></td>
+                    <td style="border-top: 1px solid #000;border-bottom: 1px dotted gray;text-align: center;font-weight: bold">TOTAL</td>
+                    <td style="border-top: 1px solid #000;border-bottom: 1px dotted gray;text-align: center;font-weight: bold">{{currency}}</td>
+                    <td style="border-top: 1px solid #000;border-bottom: 1px dotted gray;text-align: right;font-weight: bold">{{amount}}</td>
+                  </tr>
+                {{else}}
+                  <tr>
+                    <td style="border-bottom: 0px solid #000;">- {{feeItemName}}</td>
+                    <td style="border-bottom: 0px solid #000;text-align: right">{{num}}</td>
+                    <td style="border-bottom: 0px solid #000;text-align: center">{{unit}}</td>
+                    <td style="border-bottom: 0px solid #000;text-align: right">{{price}}</td>
+                    <td style="border-bottom: 0px solid #000;text-align: center">{{ppCcDesc}}</td>
+                    <td style="border-bottom: 0px solid #000;text-align: center">{{currency}}</td>
+                    <td style="border-bottom: 0px solid #000;text-align: right">{{amount}}</td>
+                  </tr>
+                {{/if}}
+            {{/each}}
+          </table>
+        </div>
+
+        <div class="div_4">
+          <div class="div_4_1">
+            <div class="div_3_1_1">请注明开票信息，如有更改请及时通知，谢谢。
+            </div>
+            <div><textarea id="confirmRemark" name="confirmRemark" style="width: 952px;height: 88px">账单备注：{{actBillOnLineVO.confirmRemark}}</textarea>
+            </div>
+            <div>发票抬头：<input id="invoiceTitle" name="invoiceTitle" style="width: 300px;height: 30px" value="{{actBillOnLineVO.invoiceTitle}}"/></div>
+          </div>
+        </div>
+
+        <div class="div_4" style="display: none">
+          <div class="div_4_1">
+            <div class="div_3_1_1">我司地址：<br/>地址：{{actBillOnLineVO.myCompanyAddress}}<br/>FAX： TEL：<br/>MAIL:</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+</script>
+
+<script src="../stimulsoft/scripts/jquery-1.10.2.min.js"></script>
+<script src="../stimulsoft/scripts/handlebars.js"></script>
+<script type="text/javascript">
+  $(document).ready(function () {
+    var search = window.location.search
+    search = search.substr(1,)
+    var arr = search.split('&')
+    var query = {}
+    arr.forEach(function (v) {
+      var d = v.split('=')
+      query[d[0]] = d[1]
+    })
+    $.ajax({
+      url: `${process.env.VUE_APP_BASE_API}/api/act-service/act/billing/confirmonline?token=` + query['token'],
+      type: "get",
+      dataType: "JSON",
+      contentType: 'application/json',
+      success: function (res) {
+        var template = Handlebars.compile($('#render-template').html());
+        $("#render-content").html(template({actBillOnLineVO: res.content}))
+      },
+      error: function () {
+
+      }
+    });
+
+    //确认状态=拒绝 || 有拒绝原因 显示拒绝框
+    if ('{{actBillOnLineVO.confirmState}}' == '{{confirmStateRefuseVal}}' || '{{actBillOnLineVO.rejectConfirmReason}}' != '') {
+      $("#divReson").css("display", "");
+      $("#btnRefuse").css("display", "none");
+      $("#btnRefuseSubmit").css("display", "");
+    }
+
+  });
+
+  function invoiceConfirm(bConfirm) {
+    var url = '{{billSubmitUrl}';
+    var postData = {};
+    postData.bConfirm = bConfirm;
+    postData.refuseReason = $("#reson").val();
+    postData.invoiceTitle = $("#invoiceTitle").val();
+    postData.confirmRemark = $("#confirmRemark").val();
+
+    //入参信息校验
+    if (!bConfirm) {
+      if (postData.refuseReason == '' || postData.refuseReason == '确认回执说明：') {
+        alert('请填入确认回执说明');
+        reson.value = '确认回执说明：';
+        $("#divReson").css("display", "");
+        return false;
+      }
+    }
+
+    if (confirm("确认提交?")) {
+      $.ajax({
+        url: url,
+        type: "PUT",
+        dataType: "JSON",
+        contentType: 'application/json',
+        data: JSON.stringify(postData),
+        success: function (result) {
+          if (result.code == '0000') {
+            alert("操作成功");
+            window.location.reload();
+          } else {
+            alert(result.message)
+          }
+        },
+        error: function () {
+          alert("操作失败！");
+        }
+      });
+    }
+  }
+
+  /**
+   * 点击拒绝,显示拒绝理由input & 绑定事件
+   * @returns {boolean}
+   */
+  function showRefuseInput() {
+    $("#divReson").css("display", "");
+    $("#btnRefuse").css("display", "none");
+    $("#btnRefuseSubmit").css("display", "");
+    return true;
+  }
+
+  /**
+   * 暂保存
+   */
+  function saveStageConfirm() {
+    var url = '{{billStageUrl}';
+    var postData = {};
+    postData.refuseReason = $("#reson").val();
+    postData.invoiceTitle = $("#invoiceTitle").val();
+    postData.confirmRemark = $("#confirmRemark").val();
+
+    $.ajax({
+      url: url,
+      type: "POST",
+      dataType: "JSON",
+      contentType: 'application/json',
+      data: JSON.stringify(postData),
+      success: function (result) {
+        if (result.code == '0000') {
+          alert("保存成功");
+          window.location.reload();
+        } else {
+          alert(result.message)
+        }
+      },
+      error: function () {
+        alert("保存成功！");
+      }
+    });
+  }
+</script>
+</html>

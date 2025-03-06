@@ -69,7 +69,8 @@ async function createApp(): Promise<void> {
     }
 
     const templateChoices: TemplateChoice[] = [
-      { name: '桌面应用', value: 'esit-frontend' },
+      { name: '桌面应用Vue2', value: 'esit-frontend' },
+      { name: '桌面应用Vue3', value: 'esit-frontend' },
       { name: '移动应用', value: 'esit-frontend' },
     ]
 

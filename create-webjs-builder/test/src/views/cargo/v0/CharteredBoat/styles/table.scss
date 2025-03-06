@@ -1,0 +1,24 @@
+.right-main-wrapper{
+    position: relative;
+    overflow: hidden;
+    overflow-y: auto;
+  }
+  .right-search-input-wrap{
+    width: 200px;
+  }
+  .multiple-form-wrap{
+    position: relative;
+  }
+.table-wrap{
+  margin-top: 20px;
+  .center-left-wrap{
+    text-align: left;
+  }
+}
+.el-pagination{
+  margin-top: 10px;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: flex-end;
+  align-items: center;
+}

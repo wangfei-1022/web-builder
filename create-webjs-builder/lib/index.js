@@ -89,8 +89,9 @@ function createApp() {
                 // 目录不存在，继续执行
             }
             const templateChoices = [
-                { name: '桌面应用', value: 'esit-frontend' },
-                { name: '移动应用', value: 'cortex-app-mobile-template' },
+                { name: '桌面应用Vue2', value: 'esit-frontend' },
+                { name: '桌面应用Vue3', value: 'esit-frontend' },
+                { name: '移动应用', value: 'esit-frontend' },
             ];
             const { templateName } = yield inquirer_1.default.prompt([
                 {
@@ -100,7 +101,7 @@ function createApp() {
                     choices: templateChoices,
                 },
             ]);
-            const tempPath = yield (0, promises_1.mkdir)((0, os_1.tmpdir)() + '/cloudplex-temp-', {
+            const tempPath = yield (0, promises_1.mkdir)((0, os_1.tmpdir)() + '/webjs-temp', {
                 recursive: true,
             });
             if (!tempPath) {

@@ -1,0 +1,23 @@
+export default {
+  monitoryTitle: '一海通定制运力船期监控',
+  vessel: '船名',
+  voyage: '航次',
+  createDate: '上架日期',
+  perLoadBox: '预计装载柜数',
+  orderBox: '订舱柜数',
+  loadedBox: '装船柜数',
+  type: '类型',
+  port: '港口',
+  etDate: '预估时间',
+  atDate: '到达时间',
+  etd: '预计时间',
+  atd: '实际时间',
+  transportTitle: '中转港航线',
+  start: '起运港',
+  transport: '中转港',
+  destination: '目的港',
+  ontime: '预计时间内到达',
+  delay: '延期到达',
+  noatd: '无ATD/ATA',
+  loadingData: '正在加载数据...'
+}

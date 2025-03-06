@@ -1,0 +1,20 @@
+export default {
+  functionPointName: '功能点名称',
+  whetherToControlDataPermissions: '是否控制数据权限',
+  code: '代码',
+  describe: '描述',
+  menuPath: '菜单路径',
+  addPermissionPoint: '新增权限点',
+  editPermissionPoints: '编辑权限点',
+  functionPoints: '功能点',
+  newDataSourceAdded: '数据源新增',
+  dataSourceEditing: '数据源编辑',
+  channelCode: '渠道方代码',
+  dataSourceType: '数据源类型',
+  ediCode: 'edi代码',
+  sourceCode: '源代码',
+  parentNode: '父节点',
+  serialNumber: '序号',
+  nodeType: '节点类型',
+  remark: '备注'
+}

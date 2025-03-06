@@ -1,0 +1,31 @@
+::v-deep .ag-theme-balham .ag-row-focus{
+  background-color: #FFDEAD;
+}
+::v-deep .ilp-text {
+  height: 16px;
+  line-height: 16px;
+  margin: 0;
+  display: inline-block;
+  vertical-align: baseline;
+  font-size: 12px;
+  color: transparent;
+  /* 背景图 */
+  background-image: linear-gradient(315deg, red, yellow);
+  /* 设置背景可见区域为文字区域 */
+  -webkit-background-clip: text; /* Safari/Chrome */
+  -moz-background-clip: text; /* Firefox */
+  background-clip: text;
+  animation: blink 2s infinite;
+}
+
+@keyframes blink {
+  0% {
+    text-shadow: none;
+  }
+  50% {
+    text-shadow: 0 0 10px red;
+  }
+  100% {
+    text-shadow: none;
+  }
+}
