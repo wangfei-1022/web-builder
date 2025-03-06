@@ -1,8 +1,11 @@
 {
-    "name": "@webjs/create-webjs-builder",
+    "name": "create-webjs-builder",
     "version": "1.0.0",
     "private": false,
     "description": "@webjs前端创建应用使用的脚手架工具",
+    "scripts": {
+        "build": "tsc"
+    },
     "author": {
       "name": "废废",
       "email": "927230462@qq.com",
@@ -27,5 +30,9 @@
       "fast-glob": "^3.2.12",
       "inquirer": "8.2.4",
       "signale": "^1.4.0"
+    },
+    "publishConfig": {
+      "access": "public",
+      "registry": "https://registry.npmjs.org/"
     }
   }

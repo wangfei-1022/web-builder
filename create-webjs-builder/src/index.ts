@@ -69,8 +69,8 @@ async function createApp(): Promise<void> {
     }
 
     const templateChoices: TemplateChoice[] = [
-      { name: '桌面应用', value: 'cortex-app-desktop-template' },
-      { name: '移动应用', value: 'cortex-app-mobile-template' },
+      { name: '桌面应用', value: 'esit-frontend' },
+      { name: '移动应用', value: 'esit-frontend' },
     ]
 
     const { templateName } = await inquirer.prompt([
@@ -82,14 +82,17 @@ async function createApp(): Promise<void> {
       },
     ])
 
-    const tempPath = await mkdir(tmpdir() + '/cloudplex-temp-', {
+    const tempPath = await mkdir(tmpdir() + '/webjs-temp', {
       recursive: true,
     })
+    if(!tempPath) {
+        return
+    }
 
     // 下载模板
     logger.await('正在下载')
     await execx(
-      `git clone --depth=1 https://gitee.com/cloudplex/${templateName}.git`,
+      `git clone --depth=1 http://gitlab.tuochetong.com/root/${templateName}.git`,
       { cwd: tempPath }
     )
 
@@ -103,9 +106,9 @@ async function createApp(): Promise<void> {
     const packageConfigNew: PackageConfig = {
       name: appName,
       version: '0.0.0',
+      ...otherConfig,
       private: true,
       template: { name, version, author, homepage },
-      ...otherConfig,
     }
 
     // 复制文件
