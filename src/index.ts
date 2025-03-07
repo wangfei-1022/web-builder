@@ -69,8 +69,8 @@ async function createApp(): Promise<void> {
     }
 
     const templateChoices: TemplateChoice[] = [
-      { name: '桌面应用Vue2', value: 'esit-frontend' },
-      { name: '桌面应用Vue3', value: 'esit-frontend' },
+      { name: '桌面应用Vue2', value: 'template-vue2' },
+      { name: '桌面应用Vue3', value: 'template-vue3' },
       { name: '移动应用', value: 'esit-frontend' },
     ]
 
@@ -82,22 +82,20 @@ async function createApp(): Promise<void> {
         choices: templateChoices,
       },
     ])
-
-    const tempPath = await mkdir(tmpdir() + '/webjs-temp', {
+    const tempPath = await mkdir(tmpdir() + '/webjs-temp-', {
       recursive: true,
     })
     if(!tempPath) {
         return
     }
-
     // 下载模板
     logger.await('正在下载')
     await execx(
-      `git clone --depth=1 http://gitlab.tuochetong.com/root/${templateName}.git`,
+      `git clone --depth=1 git@github.com:wangfei-1022/web-builder.git`,
       { cwd: tempPath }
     )
+    const templateRoot = join(tempPath, 'web-builder/generator/' + templateName)
 
-    const templateRoot = join(tempPath, templateName)
     // 动态导入 package.json 文件
     const templatePackageConfig: PackageConfig = await import(
       join(templateRoot, 'package.json')

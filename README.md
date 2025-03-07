@@ -5,5 +5,5 @@
 ## 使用
 
 ```bash
-pnpm create webjs-builder
+pnpm create web-builder
 ```

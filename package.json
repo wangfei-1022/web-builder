@@ -1,6 +1,6 @@
 {
     "name": "create-web-builder",
-    "version": "1.0.3",
+    "version": "1.0.5",
     "private": false,
     "description": "@webjs前端创建应用使用的脚手架工具",
     "scripts": {
@@ -11,9 +11,9 @@
       "email": "927230462@qq.com",
       "url": "http://www.wf-ljq.shop"
     },
-    "homepage": "https://github.com/wangfei-1022/webjs/tree/main/create-webjs-builder",
+    "homepage": "https://github.com/wangfei-1022/web-builder",
     "bin": {
-      "create-webjs-builder": "bin/create-webjs-builder"
+      "create-web-builder": "bin/create-web-builder"
     },
     "files": [
       "bin",
